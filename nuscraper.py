@@ -157,9 +157,8 @@ class NuScraper:
                         page = urlopen('http://www.nujij.nl'+href)
                         nu_soup = BeautifulSoup(page)
                         comment_list.append(nu_soup.find("div", {"class": "bericht-subsectie"}))
-                    except (HTTPError, socket.error) as e:
-                        #if url doesn't exist or is blocked
-                        if e.reason[0] == 104:
+                    except (HTTPError, socket.error, URLError) as e:
+                        if e.reason[0] is 104 or e.reason[0] is 110:
                             self.log.nlog.warning("Connection reset by peer. Trying again.")
                             time.sleep(5)
                             self.fetch_comm(comments)
@@ -242,9 +241,8 @@ class NuScraper:
 
         try:
             page = urlopen('http://m.nu.nl/'+backlink)
-        except (HTTPError, socket.error) as e:
-            #if url doesn't exist or is blocked
-            if e.reason[0] == 104:
+        except (HTTPError, socket.error, URLError) as e:
+            if e.reason[0] is 104 or e.reason[0] is 110:
                 self.log.nlog.warning("Connection reset by peer. Trying again.")
                 time.sleep(5)
                 self.fetch_nujij(soup, tries)
@@ -269,9 +267,8 @@ class NuScraper:
 
             try:
                 nujij = urlopen(lynx)
-            except (HTTPError, socket.error) as e:
-            #if url doesn't exist or is blocked
-                if e.reason[0] == 104:
+            except (HTTPError, socket.error, URLError) as e:
+                if e.reason[0] is 104 or e.reason[0] is 110:
                     self.log.nlog.warning("Connection reset by peer. Trying again.")
                     time.sleep(5)
                     self.fetch_nujij(soup, tries)

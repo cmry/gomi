@@ -173,8 +173,8 @@ class Scraper:
             opener.addheaders = [('User-agent', self.stealth())]
             page = opener.open(query)
             return page
-        except (HTTPError, socket.error) as e:
-            if e.reason[0] == 104:
+        except (HTTPError, socket.error, URLError) as e:
+            if e.reason[0] is 104 or e.reason[0] is 110:
                 self.log.nlog.warning("Connection reset by peer. Trying again.")
                 time.sleep(5)
                 self.query(query)
