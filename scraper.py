@@ -174,7 +174,7 @@ class Scraper:
             page = opener.open(query)
             return page
         except (HTTPError, socket.error, URLError) as e:
-            if e.reason[0] is 104 or e.reason[0] is 110:
+            if e.reason[0] is 104 or 'URLError' in e:
                 self.log.nlog.warning("Connection reset by peer. Trying again.")
                 time.sleep(5)
                 self.query(query)
