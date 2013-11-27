@@ -124,7 +124,7 @@ class TwkScraper:
         textl = []
         if text:
             for line in text:
-                #line = line.encode("utf-8")
+                line = line.encode("utf-8")
                 if str(line) == '<br/>':
                     textl.append('\n')
                 elif str(line).startswith('<img alt'):
