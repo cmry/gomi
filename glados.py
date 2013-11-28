@@ -54,10 +54,12 @@ class IRCCat(irclib.SimpleIRCClient):
 
 def main():
 
-    lab = IRCCat('haitlab')
+    with open('ch.txt', 'r') as fl:
+        inf = fl.read().split(' ')
+    lab = IRCCat(inf[0])
 
     try:
-        lab.connect('irc.uvt.nl', 6667, 'GLaDOS')
+        lab.connect(inf[1], 6667, 'GLaDOS')
     except irclib.ServerConnectionError, x:
         print x
         sys.exit(1)

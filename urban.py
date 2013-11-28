@@ -1,66 +1,60 @@
 __author__ = 'chris'
 
 from query import *
-import urllib2
+from urllib2 import urlopen
 
-def urban(message):
 
-    q = Query()
-    query = q.search(message)
+class Urban:
 
-    def_nr = 0
+    def __init__(self):
+        """ Old module, did some code improvement, not written with OOP
+        in mind though. Moreover, its a very crude solution, should use bs4. """
+        self.q = Query()
 
-    if " " in query:
-        query = query.replace(" ","%20")
-    try:
-        def_nr = int(query[len(query)-1])-1
-        query = query[:-4]
-    except:
-        pass
+    def grab_def(self, data):
+        def_raw, def_list = "", []
+        concat, record = False, True
+        divcount = 0
 
-    url = 'http://www.urbandictionary.com/define.php?term=' + query
+        for line in data.split():
+            if divcount is 2:
+                definition = ""
+                def_raw = def_raw.replace('<div class="example">', '\n\n').replace(' class="definition"', '')
+                for character in def_raw:
+                    if character is "<":
+                        record = False
+                    elif character is ">":
+                        record = True
+                    elif not record:
+                        continue
+                    else:
+                        definition += character
+                def_list.append(definition.replace("&#39;", "'").replace("&quot;", '"'))
+                divcount, concat, def_raw = 0, False, ""
 
-    usock = urllib2.urlopen(url)
-    data = usock.read()
-    usock.close()
-    def_raw = ""
-    def_list = []
-    concat = False
-    record = True
-    divcount = 0
+            elif line.startswith('class="definition"') or concat:
+                def_raw += (" "+line)
+                concat = True
+                if "</div>" in line:
+                    divcount += 1
+            else:
+                continue
 
-    for line in data.split():
-        if divcount == 2:
-            definition = ""
-            def_raw = def_raw.replace('<div class="example">','\n\n')
-            def_raw = def_raw.replace(' class="definition"','')
-            for character in def_raw:
-                if character == "<":
-                    record = False
-                    continue
-                elif character == ">":
-                    record = True
-                    continue
-                elif record == False:
-                    continue
-                else:
-                    definition += character
+        return def_list
 
-            definition = definition.replace("&#39;","'")
-            definition = definition.replace("&quot;",'"')
-            def_list.append(definition)
-            divcount = 0
-            concat = False
-            def_raw = ""
-        elif line.startswith('class="definition"') or concat == True:
-            def_raw += (" "+line)
-            concat = True
-            if "</div>" in line:
-                divcount += 1
+    def urban(self, message):
+        q = self.q.search(message).split(' ')
+        def_nr = int(q[len(q)-1]) if len(q) > 1 else 0
+        if def_nr is not 0:
+            q.remove(q[len(q)-1])
+        q = '%20'.join(q)
+
+        def_list = self.grab_def(urlopen('http://www.urbandictionary.com/define.php?term='+q).read())
+
+        if def_list:
+            try:
+                return self.q.cut(def_list[def_nr])
+            except IndexError:
+                return "Corrupted cores! We're in luck."
         else:
-            continue
-
-    if def_list:
-        return q.cut(def_list[def_nr])
-    else:
-        return "Corrupted cores! We're in luck."
+            return "Corrupted cores! We're in luck."
