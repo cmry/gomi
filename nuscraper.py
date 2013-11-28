@@ -207,10 +207,6 @@ class NuScraper:
         """ Parses the comment text. """
         textl = []
         if text:
-            #try:
-            #    text = text.encode("utf-8")
-            #except UnicodeDecodeError:
-            #    self.log.nlog.error("Unicode error!")
             if str(text) == '<br/>':
                 textl.append('\n')
             elif str(text).startswith('<img alt'):
@@ -289,6 +285,6 @@ class NuScraper:
     def fetch_tagcont(self, tagline):
         """ Overused tag content fetcher, probably in bs4 as well. """
         strip = MLStripper()
-        strip.feed(str(tagline))
+        strip.feed(unicode(str(tagline)))
         res = strip.get_data()
         return res
