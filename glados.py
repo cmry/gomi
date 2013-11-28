@@ -10,7 +10,6 @@ class IRCCat(irclib.SimpleIRCClient):
 
     def __init__(self, target):
         irclib.SimpleIRCClient.__init__(self)
-        self.cmd = CmdStrap()
         self.target = target
         self.quotes = "\n".join(io.open("glados_quotes.txt","r").readlines()).split("\n\n")
 
@@ -25,15 +24,16 @@ class IRCCat(irclib.SimpleIRCClient):
         sys.exit(0)
 
     def on_pubmsg(self, connection, event):
+        cmd = CmdStrap()
         message, sender = event.arguments()[0], event.source()[0:event.source().find("!")]
         print sender + ": " + message
 
         if message.find("glados") != -1 or message.find("GLaDOS") != -1:
-            self.talk(self.cmd.own(message, sender)) if self.cmd.own(message, sender) is not 'pass' else self.talk(self.quote())
+            self.talk(cmd.own(message, sender)) if cmd.own(message, sender) is not 'pass' else self.talk(self.quote())
         elif message.find("cake") != -1:
-            self.talk(self.cmd.get_line("cake"))
+            self.talk(cmd.get_line("cake"))
         else:
-            self.talk(self.cmd.gen(message, sender)) if self.cmd.gen(message, sender) else time.sleep(1)
+            self.talk(cmd.gen(message, sender)) if cmd.gen(message, sender) else time.sleep(1)
 
 
     def talk(self, msg):
@@ -54,15 +54,20 @@ class IRCCat(irclib.SimpleIRCClient):
 
 def main():
 
-    lab = IRCCat('haitlab')
-
     try:
-        lab.connect('irc.uvt.nl', 6667, 'GLaDOS')
-    except irclib.ServerConnectionError, x:
-        print x
-        sys.exit(1)
+        with open('ch.txt', 'r') as fl:
+            inf = fl.read().split(' ')
+        lab = IRCCat(inf[0])
 
-    lab.start()
+        try:
+            lab.connect(inf[1], 6667, 'GLaDOS')
+        except irclib.ServerConnectionError, x:
+            print x
+            sys.exit(1)
+
+        lab.start()
+    except Exception as e:
+        print e
 
 if __name__ == "__main__":
     main()

@@ -1,6 +1,5 @@
 __author__ = 'chris'
 
-from glados import IRCCat
 from twemo import *
 from wiki import *
 from urban import *
@@ -14,7 +13,8 @@ class CmdStrap:
     def own(self, message, sender):
 
         if message.find("help") != -1:
-            return "Version 1.1.5 - 13.10 \n" \
+            return "Version 1.1.7 - 13.11 \n" \
+                   "Code viewable on https://github.com/fazzeh/PyDOS \n" \
                    "AuCoPro: \t\t\t glados aucopro [word] \n" \
                    "AuCoPro Check: \t\t glados aucocheck [user] [em##]\n \t\t\t\t\t [base/heid/ster] \n" \
                    "Wikipedia: \t\t\t glados wiki [query] \n" \
@@ -48,7 +48,8 @@ class CmdStrap:
             return twemo.get_metr()
         
         elif message.find("urban") != -1:
-            return urban(message)
+            urban = Urban()
+            return urban.urban(message)
 
         elif message.find("nsa") != -1:
             nsa = NSA()
