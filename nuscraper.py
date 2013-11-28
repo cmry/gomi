@@ -2,7 +2,6 @@ __author__ = 'chris'
 
 import socket
 from article import *
-from mlstrip import *
 from urllib2 import *
 from bs4 import BeautifulSoup
 from re import compile

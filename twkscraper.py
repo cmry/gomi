@@ -1,7 +1,6 @@
 __author__ = 'chris'
 
 from article import *
-from mlstrip import MLStripper
 from re import compile
 
 class TwkScraper:
@@ -113,7 +112,7 @@ class TwkScraper:
                     self.art.comment['comment_time'] = str(datel[3])
                     datel = []
         except (AttributeError, IndexError) as e:
-            self.log.tlog.warning("Error "+str(e)+" occurred in current article.")
+            self.log.tlog.warning("Error "+str(e)+" occurred in "+str(self.target))
             pass
 
     def fetch_commt(self, text):
@@ -139,4 +138,8 @@ class TwkScraper:
 
     def fetch_tagcont(self, tagline):
         """ Overused tag content fetcher, clearer if in function. """
-        return ''.join(tagline.findAll(text=True))
+        try:
+            return ''.join(tagline.findAll(text=True))
+        except AttributeError as e:
+            self.log.tlog.error(str(e) + " in " + str(self.target))
+            return str('')
