@@ -86,6 +86,7 @@ class Article:
         with open('res/'+str(self.article['id'])+'.txt', 'w') as f:
             f.write(json.dumps(self.article,
                                sort_keys=False,
+                               encoding='utf-8',
                                indent=4, ensure_ascii=False,
                                separators=(',', ': ')))
 
