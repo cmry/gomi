@@ -112,32 +112,30 @@ class TwkScraper:
                     self.art.comment['comment_time'] = str(datel[3])
                     datel = []
         except (AttributeError, IndexError) as e:
-            self.log.tlog.warning("Error "+str(e)+" occurred in "+str(self.target))
+            self.log.tlog.warning("Error "+str(e)+" occurred in current article.")
             pass
 
     def fetch_commt(self, text):
         """ Parses the comment text. """
         textl = []
         if text:
-            if str(text) == '<br/>':
-                textl.append('\n')
-            elif str(text).startswith('<img alt'):
-                img = text.find('img')
-                if img and type(img) is not int:
-                    textl.append(str(img['alt']))
-            else:
-                text = str(text).replace('\n', '')
-                text = str(text).replace('\r', '')
-                text = str(text).replace('\t', '')
-                text = compile(r'<.*?>').sub('', text)
-                textl.append(text)
+            for line in text:
+                line = line.encode("utf-8")
+                if str(line) == '<br/>':
+                    textl.append('\n')
+                elif str(line).startswith('<img alt'):
+                    img = line.find('img')
+                    if img and type(img) is not int:
+                        textl.append(str(img['alt']))
+                else:
+                    line = str(line).replace('\n', '')
+                    line = str(line).replace('\r', '')
+                    line = str(line).replace('\t', '')
+                    line = compile(r'<.*?>').sub('', line)
+                    textl.append(line)
 
         self.art.comment['comment_text'] = ' '.join(textl)
 
     def fetch_tagcont(self, tagline):
         """ Overused tag content fetcher, clearer if in function. """
-        try:
-            return ''.join(tagline.findAll(text=True))
-        except AttributeError as e:
-            self.log.tlog.error(str(e) + " in " + str(self.target))
-            return str('')
+        return ''.join(tagline.findAll(text=True))
