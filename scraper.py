@@ -84,8 +84,8 @@ class Scraper:
             while not self.log.halt:
                 if self.radar:
                     self.stealth()
-                if self.fetch_art(site, entry):
-
+                site.charset = self.fetch_art(site, entry)
+                if site.charset:
                         #scrape operations
                         self.fetch_target(site)
                         self.fetch_nr(site, entry)
@@ -153,7 +153,7 @@ class Scraper:
             self.article = slices['article']
             self.subject = slices['subject']
             self.comments = slices['comments']
-            return True
+            return charset
         else:
             #yield error if we don't have a page for some reason
             return False

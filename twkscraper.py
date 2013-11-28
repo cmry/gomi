@@ -13,6 +13,7 @@ class TwkScraper:
         #this class is tailored to tweakers.net
         self.target = 'http://www.tweakers.net/'+cat+'/'
         self.art = Article(log)
+        self.charset = None
         self.log = log
 
     def __del__(self):

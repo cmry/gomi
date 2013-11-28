@@ -18,6 +18,7 @@ class NuScraper:
 
         #this class is tailored to nu.nl
         self.target = 'http://www.nu.nl/'+cat+'/'
+        self.charset = None
         self.art = Article(log)
         self.log = log
 
