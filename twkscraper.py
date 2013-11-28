@@ -143,6 +143,6 @@ class TwkScraper:
     def fetch_tagcont(self, tagline):
         """ Overused tag content fetcher, probably in bs4 as well. """
         strip = MLStripper()
-        strip.feed(unicode(str(tagline)))
+        strip.feed(str(tagline))
         res = strip.get_data()
         return res
