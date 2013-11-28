@@ -6,8 +6,6 @@ from collections import Counter
 
 class Twemo:
 
-    # Helper functions for building Twitter queries.
-
     def __init__(self, term, until_date):
 
         self.q = Query()
@@ -20,7 +18,6 @@ class Twemo:
         self.sar = [":')"]
         self.sad = [":(", ":((", ":-(", ":'(", ":'-("]
         self.ang = [":@", ":-@"]
-        #self.con = [":/", ":|", ":S"]
         self.con = [":s", ":S"]
         self.cyn = [":x", ";x", "-_-", "-_-'"]
 
@@ -81,14 +78,9 @@ class Twemo:
         else:
             return term
 
-
-    # Twitter API
-
     def create_twitter_api(self):
         """Create and return an authenticated instance of Twitter API."""
         return Twitter(auth=OAuth(self.access_token, self.access_token_secret, self.consumer_key, self.consumer_secret))
-
-    # Helper function for analyzing tweets
 
     def find_min_id(self, dl):
         res = min(i['id'] for i in dl)
@@ -104,9 +96,9 @@ class Twemo:
         return "|".join(res)
 
     def pos_neg_counts(self):
-        '''Searches for occurences of terms in pos and terms in neg in
+        """Searches for occurences of terms in pos and terms in neg in
         each of the texts and return a tuple of how many pos matches and neg
-        matches were found.'''
+        matches were found. """
         hap, jau, sar = self.re_disjunction(self.hap), self.re_disjunction(self.jau), self.re_disjunction(self.sar)
         sad, ang, con = self.re_disjunction(self.sad), self.re_disjunction(self.ang), self.re_disjunction(self.con)
         cyn = self.re_disjunction(self.cyn)
@@ -128,22 +120,17 @@ class Twemo:
                 conc += 1
             if re.search(cyn,t):
                 cync += 1
-            #with codecs.open(self.bigdatar,'ab+', 'utf-8') as fl:
-            #    fl.write(t+'\n')
 
-        return (hapc,jauc,sarc,sadc,angc,conc,cync)
+        return (hapc, jauc, sarc, sadc, angc, conc, cync)
 
     def sanitize(self, t):
-
         pattern = re.compile('[\W_]+')
-
         t = [x.lower() for x in t]
         t = [pattern.sub('', x) for x in t]
         t = filter(None, t)
         return t
 
     def matchwords(self, target):
-
         for line in target:
             t = line.split(' ')
             if set(t) & set(self.hap):
@@ -167,7 +154,7 @@ class Twemo:
             with codecs.open(target, 'r', 'utf-8') as fl:
                 for line in fl:
                     corpus.extend(line.split())
-        except:
+        except Exception:
             corpus = target
 
         corpus = list(set(corpus))
@@ -179,35 +166,19 @@ class Twemo:
 
         return counter.most_common(am)
 
-    # Searching via Twitter API
-
     def twitter_search_all(self, api, query, max_id=None):
         '''Run query on twitter and yield each tweet from from
         all the result pages.'''
-        # This function uses the yield keyword instead of returning a list.
-        # Yield returns the elements incrementally instead of all at once.
-        # You can learn more about such "generator functions" in Data Processing Advanced.
         if max_id:
             r = api.search.tweets(q=query, count=100, max_id=max_id)
         else:
             r = api.search.tweets(q=query, count=100)
-        # if there are no more statuses, stop yielding
         if len(r.get('statuses', [])) == 0:
             if False:
                 yield
-        # Otherwise yield the current results, and fetch the next page by specifying
-        # the max_id parameter.
         else:
             min_id = self.find_min_id(r['statuses'])
             for tweet in r['statuses']:
                 yield tweet
             for tweet in self.twitter_search_all(api, query, max_id=min_id-1):
                 yield tweet
-
-
-    ###########################
-
-#twemo = Twemo('NSA', False)
-#print twemo.get_metr()
-#print twemo.get_count(twemo.bigdatar, 10)
-#print twemo.get_wordlink('hap',20)
