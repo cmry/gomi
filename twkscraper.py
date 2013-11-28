@@ -22,7 +22,6 @@ class TwkScraper:
     def fetch_slices(self, soup):
         """ Returns categories into a dict to parent attributes for
             overall use, Tweakers specific """
-        print soup.find("div", {"id": "commentColumn"})
         return {"header":   soup.find("h1", {"class": "ellipsis"}),
                 "article":  soup.find("div", {"class": "articleColumn"}),
                 "subject":  soup.find("div", {"class": "relevancyColumn"}),
