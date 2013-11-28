@@ -29,11 +29,11 @@ class IRCCat(irclib.SimpleIRCClient):
         print sender + ": " + message
 
         if message.find("glados") != -1 or message.find("GLaDOS") != -1:
-            self.talk(self.cmd.own(message, sender)) if self.cmd.own(message, sender) is not 'pass' else self.talk(self.quote())
+            self.talk(cmd.own(message, sender)) if cmd.own(message, sender) is not 'pass' else self.talk(self.quote())
         elif message.find("cake") != -1:
-            self.talk(self.cmd.get_line("cake"))
+            self.talk(cmd.get_line("cake"))
         else:
-            self.talk(self.cmd.gen(message, sender)) if self.cmd.gen(message, sender) else time.sleep(1)
+            self.talk(cmd.gen(message, sender)) if cmd.gen(message, sender) else time.sleep(1)
 
 
     def talk(self, msg):
