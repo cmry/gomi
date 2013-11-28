@@ -13,7 +13,7 @@ class CmdStrap:
     def own(self, message, sender):
 
         if message.find("help") != -1:
-            return "Version 1.1.6 - 13.11 \n" \
+            return "Version 1.1.7 - 13.11 \n" \
                    "Code viewable on https://github.com/fazzeh/PyDOS \n" \
                    "AuCoPro: \t\t\t glados aucopro [word] \n" \
                    "AuCoPro Check: \t\t glados aucocheck [user] [em##]\n \t\t\t\t\t [base/heid/ster] \n" \
