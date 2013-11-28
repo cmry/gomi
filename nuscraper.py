@@ -34,15 +34,6 @@ class NuScraper:
                "comments": self.fetch_nujij(soup)}
         return res
 
-    def fetch_err(self, error_focus):
-        """ Checks if the website yeilds 404 or comments are empty. """
-        if error_focus.find(text="De pagina die u op onze site zocht kan helaas niet gevonden worden."):
-            self.log.nlog.critical("404")
-            self.log.halt = True
-        if error_focus.find(text="Reactie plaatsen > Stap 1"):
-            self.log.nlog.critical("NoComments")
-            self.log.halt = True
-
     def fetch_cont(self, article):
         """ Grabs the date and text fields. """
         field = article.find("div", {"class": "dateplace-data"})
@@ -285,7 +276,4 @@ class NuScraper:
 
     def fetch_tagcont(self, tagline):
         """ Overused tag content fetcher, probably in bs4 as well. """
-        strip = MLStripper()
-        strip.feed(tagline.encode(self.charset))
-        res = strip.get_data()
-        return res
+        return ''.join(tagline.findAll(text=True))

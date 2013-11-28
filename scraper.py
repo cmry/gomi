@@ -85,23 +85,22 @@ class Scraper:
                 if self.radar:
                     self.stealth()
                 if self.fetch_art(site, entry):
-                        #scrape operations
-                        self.fetch_target(site)
-                        self.fetch_nr(site, entry)
-                        self.fetch_art(site, entry)
+                    #scrape operations
+                    self.fetch_target(site)
+                    self.fetch_nr(site, entry)
+                    self.fetch_art(site, entry)
 
-                        #site operations
-                        site.fetch_err(self.article)
-                        site.fetch_cont(self.article)
-                        site.fetch_head(self.header)
-                        site.fetch_subj(self.subject)
-                        site.fetch_comm(self.comments)
+                    #site operations
+                    site.fetch_cont(self.article)
+                    site.fetch_head(self.header)
+                    site.fetch_subj(self.subject)
+                    site.fetch_comm(self.comments)
 
-                        #drop info in class and show
-                        site.art.struc_article()
-                        #print site.art.article
-                        del site
-                        return
+                    #drop info in class and show
+                    site.art.struc_article()
+                    #print site.art.article
+                    del site
+                    return
                 else:
                     #abort on non-existent articles
                     self.log.halt = True
@@ -145,14 +144,13 @@ class Scraper:
 
         if page:
             #added encoding, hopefully solves encoding problems throughout
-            charset = page.headers['content-type'].split('charset=')[-1]
-            soup = BeautifulSoup(page.read().decode(charset))
+            soup = BeautifulSoup(page)
             slices = site.fetch_slices(soup)
             self.header = slices['header']
             self.article = slices['article']
             self.subject = slices['subject']
             self.comments = slices['comments']
-            return charset
+            return True
         else:
             #yield error if we don't have a page for some reason
             return False

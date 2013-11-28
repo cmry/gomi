@@ -19,13 +19,10 @@ class TwkScraper:
     def __del__(self):
         name = self.__class__.__name__
 
-    def fetch_err(self, error_focus):
-        if error_focus.find(text='404 Not Found'):
-            return "404"
-
     def fetch_slices(self, soup):
         """ Returns categories into a dict to parent attributes for
             overall use, Tweakers specific """
+        print soup.find("div", {"id": "commentColumn"})
         return {"header":   soup.find("h1", {"class": "ellipsis"}),
                 "article":  soup.find("div", {"class": "articleColumn"}),
                 "subject":  soup.find("div", {"class": "relevancyColumn"}),
@@ -142,11 +139,5 @@ class TwkScraper:
         self.art.comment['comment_text'] = ' '.join(textl)
 
     def fetch_tagcont(self, tagline):
-        """ Overused tag content fetcher, probably in bs4 as well. """
-        try:
-            strip = MLStripper()
-            strip.feed(tagline.encode(self.charset))
-            res = strip.get_data()
-        except AttributeError:
-            return None
-        return res
+        """ Overused tag content fetcher, clearer if in function. """
+        return ''.join(tagline.findAll(text=True))
