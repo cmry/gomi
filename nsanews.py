@@ -8,7 +8,8 @@ from bs4 import BeautifulSoup
 class NSA:
 
     def __init__(self):
-
+        """ More recent module, kinda neatly written. Based on Dutch
+        website. """
         self.keys = ['NSA', 'Snowden', 'FBI', 'privacy']
 
     def grab_daily(self):
