@@ -10,7 +10,6 @@ class IRCCat(irclib.SimpleIRCClient):
 
     def __init__(self, target):
         irclib.SimpleIRCClient.__init__(self)
-        self.cmd = CmdStrap()
         self.target = target
         self.quotes = "\n".join(io.open("glados_quotes.txt","r").readlines()).split("\n\n")
 
@@ -25,6 +24,7 @@ class IRCCat(irclib.SimpleIRCClient):
         sys.exit(0)
 
     def on_pubmsg(self, connection, event):
+        cmd = CmdStrap()
         message, sender = event.arguments()[0], event.source()[0:event.source().find("!")]
         print sender + ": " + message
 
@@ -54,17 +54,20 @@ class IRCCat(irclib.SimpleIRCClient):
 
 def main():
 
-    with open('ch.txt', 'r') as fl:
-        inf = fl.read().split(' ')
-    lab = IRCCat(inf[0])
-
     try:
-        lab.connect(inf[1], 6667, 'GLaDOS')
-    except irclib.ServerConnectionError, x:
-        print x
-        sys.exit(1)
+        with open('ch.txt', 'r') as fl:
+            inf = fl.read().split(' ')
+        lab = IRCCat(inf[0])
 
-    lab.start()
+        try:
+            lab.connect(inf[1], 6667, 'GLaDOS')
+        except irclib.ServerConnectionError, x:
+            print x
+            sys.exit(1)
+
+        lab.start()
+    except Exception as e:
+        print e
 
 if __name__ == "__main__":
     main()
