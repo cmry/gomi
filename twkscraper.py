@@ -119,20 +119,18 @@ class TwkScraper:
         """ Parses the comment text. """
         textl = []
         if text:
-            for line in text:
-                line = line.encode("utf-8")
-                if str(line) == '<br/>':
-                    textl.append('\n')
-                elif str(line).startswith('<img alt'):
-                    img = line.find('img')
-                    if img and type(img) is not int:
-                        textl.append(str(img['alt']))
-                else:
-                    line = str(line).replace('\n', '')
-                    line = str(line).replace('\r', '')
-                    line = str(line).replace('\t', '')
-                    line = compile(r'<.*?>').sub('', line)
-                    textl.append(line)
+            if str(text) == '<br/>':
+                textl.append('\n')
+            elif str(text).startswith('<img alt'):
+                img = text.find('img')
+                if img and type(img) is not int:
+                    textl.append(str(img['alt']))
+            else:
+                text = str(text).replace('\n', '')
+                text = str(text).replace('\r', '')
+                text = str(text).replace('\t', '')
+                text = compile(r'<.*?>').sub('', text)
+                textl.append(text)
 
         self.art.comment['comment_text'] = ' '.join(textl)
 

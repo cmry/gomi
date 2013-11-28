@@ -143,7 +143,6 @@ class Scraper:
         page = self.query(site.target+str(nr)+'/')
 
         if page:
-            #added encoding, hopefully solves encoding problems throughout
             soup = BeautifulSoup(page)
             slices = site.fetch_slices(soup)
             self.header = slices['header']
