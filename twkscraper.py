@@ -13,7 +13,7 @@ class TwkScraper:
         #this class is tailored to tweakers.net
         self.target = 'http://www.tweakers.net/'+cat+'/'
         self.art = Article(log)
-        self.charset = None
+        self.charset = 'iso-8859-15'
         self.log = log
 
     def __del__(self):
@@ -143,7 +143,10 @@ class TwkScraper:
 
     def fetch_tagcont(self, tagline):
         """ Overused tag content fetcher, probably in bs4 as well. """
-        strip = MLStripper()
-        strip.feed(str(tagline))
-        res = strip.get_data()
+        try:
+            strip = MLStripper()
+            strip.feed(tagline.encode(self.charset))
+            res = strip.get_data()
+        except AttributeError:
+            return None
         return res

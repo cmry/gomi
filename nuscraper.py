@@ -18,7 +18,7 @@ class NuScraper:
 
         #this class is tailored to nu.nl
         self.target = 'http://www.nu.nl/'+cat+'/'
-        self.charset = None
+        self.charset = 'utf-8'
         self.art = Article(log)
         self.log = log
 
@@ -286,6 +286,6 @@ class NuScraper:
     def fetch_tagcont(self, tagline):
         """ Overused tag content fetcher, probably in bs4 as well. """
         strip = MLStripper()
-        strip.feed(unicode(str(tagline)))
+        strip.feed(tagline.encode(self.charset))
         res = strip.get_data()
         return res

@@ -84,8 +84,7 @@ class Scraper:
             while not self.log.halt:
                 if self.radar:
                     self.stealth()
-                site.charset = self.fetch_art(site, entry)
-                if site.charset:
+                if self.fetch_art(site, entry):
                         #scrape operations
                         self.fetch_target(site)
                         self.fetch_nr(site, entry)
