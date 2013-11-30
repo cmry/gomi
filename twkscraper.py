@@ -144,4 +144,5 @@ class TwkScraper:
         try:
             return ''.join(tagline.findAll(text=True))
         except AttributeError:
+            self.log.tlog.error("No introduction was found in current article.")
             return ""

@@ -201,6 +201,7 @@ class NuScraper:
         """ Parses the comment text. """
         textl = []
         if text:
+            text = text.encode("utf-8")
             if str(text) == '<br/>':
                 textl.append('\n')
             elif str(text).startswith('<img alt'):
