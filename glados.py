@@ -1,73 +1,45 @@
-import irclib
+from irclib import *
 import sys
-import io
-import random
-import time
+from time import sleep
+from conf import *
 from commands import *
 
 
-class IRCCat(irclib.SimpleIRCClient):
+class IRCCat(SimpleIRCClient):
 
-    def __init__(self, target):
-        irclib.SimpleIRCClient.__init__(self)
-        self.target = target
-        self.quotes = "\n".join(io.open("glados_quotes.txt","r").readlines()).split("\n\n")
+    def __init__(self, chl):
+        SimpleIRCClient.__init__(self)
+        self.tag = chl
 
-    def on_welcome(self, connection, event):
-        if irclib.is_channel("#"+self.target):
-            connection.join("#"+self.target)
-            self.target="#"+self.target
+    def on_welcome(self, con, evt):
+        if is_channel("#"+self.tag):
+            con.join("#"+self.tag)
         else:
             self.send_it()
 
-    def on_disconnect(self, connection, event):
-        sys.exit(0)
-
-    def on_pubmsg(self, connection, event):
+    def on_pubmsg(self, con, evt):
         cmd = CmdStrap()
-        message, sender = event.arguments()[0], event.source()[0:event.source().find("!")]
-        print sender + ": " + message
-
-        if message.find("glados") != -1 or message.find("GLaDOS") != -1:
-            self.talk(cmd.own(message, sender)) if cmd.own(message, sender) is not 'pass' else self.talk(self.quote())
-        elif message.find("cake") != -1:
-            self.talk(cmd.get_line("cake"))
+        message, sender = evt.arguments()[0], evt.source()[0:evt.source().find("!")]
+        if message.lower().find("glados") != -1:
+            self.talk(cmd.own(message, sender))
         else:
-            self.talk(cmd.gen(message, sender)) if cmd.gen(message, sender) else time.sleep(1)
-
+            self.talk(cmd.gen(message, sender)) if cmd.gen(message, sender) else sleep(1)
 
     def talk(self, msg):
-        if isinstance(msg, str):
-            msg = str(msg)
-            for l in msg.split("\n"):
-                self.connection.privmsg(self.target, l)
-        else:
-            for l in msg:
-                self.connection.privmsg(self.target, l)
+        for l in msg.split("\n"):
+            self.connection.privmsg(self.tag, l)
 
-    def quote(self):
-        for q in self.quotes[random.randint(0,len(self.quotes)-1)].split("\n"):
-            return q
-
-    def leave(self):
-        self.connection.quit(self.get_line("leave"))
+    def on_disconnect(self, con, evt):
+        main()
 
 def main():
-
+    server = IRCCat(cl)
     try:
-        with open('ch.txt', 'r') as fl:
-            inf = fl.read().split(' ')
-        lab = IRCCat(inf[0])
-
-        try:
-            lab.connect(inf[1], 6667, 'GLaDOS')
-        except irclib.ServerConnectionError, x:
-            print x
-            sys.exit(1)
-
-        lab.start()
-    except Exception as e:
-        print e
+        server.connect(sn, p, bn)
+    except ServerConnectionError, x:
+        print x
+        sys.exit(1)
+    server.start()
 
 if __name__ == "__main__":
     main()
