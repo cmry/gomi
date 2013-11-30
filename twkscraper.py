@@ -141,4 +141,7 @@ class TwkScraper:
 
     def fetch_tagcont(self, tagline):
         """ Overused tag content fetcher, clearer if in function. """
-        return ''.join(tagline.findAll(text=True))
+        try:
+            return ''.join(tagline.findAll(text=True))
+        except AttributeError:
+            return ""
