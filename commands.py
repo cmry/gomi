@@ -3,7 +3,7 @@ __author__ = 'chris'
 import io
 import random
 from twemo import *
-from wiki import *
+#from wiki import *
 from urban import *
 from aucopro import *
 from nsanews import *
@@ -13,6 +13,8 @@ from sys import exit
 class CmdStrap:
 
     def own(self, message, sender):
+
+        print message
 
         if message.find("help") != -1:
             return "Version 1.2.0 - 13.11 \n" \
@@ -41,9 +43,9 @@ class CmdStrap:
             acp = ACP()
             return acp.aucocheck(message)
 
-        elif message.find("wiki") != -1:
-            wiki = Wiki()
-            return wiki.wiki(message)
+        #elif message.find("wiki") != -1:
+            #wiki = Wiki()
+            #return wiki.wiki(message)
 
         elif message.find("twemo") != -1:
             twemo = Twemo(message, False)
