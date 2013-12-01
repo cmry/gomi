@@ -33,6 +33,7 @@ class IRCCat(irclib.SimpleIRCClient):
                 self.talk(cmd.own(message, sender))
             else:
                 self.talk(cmd.gen(message, sender)) if cmd.gen(message, sender) else sleep(1)
+            del cmd
         except Exception as e:
             #prevent disconnects due to crappy programming
             self.talk("The cake is a lie.")
