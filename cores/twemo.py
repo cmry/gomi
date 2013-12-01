@@ -1,3 +1,6 @@
+__author__ = 'chris'
+__file__ = 'twemo.py'
+
 from twitter import *
 from query import *
 import re

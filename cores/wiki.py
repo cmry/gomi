@@ -2,7 +2,7 @@ __author__ = 'chris'
 
 from wiki2plain import Wiki2Plain
 from wikipedia import Wikipedia
-from query import *
+from main.query import *
 
 class Wiki:
 

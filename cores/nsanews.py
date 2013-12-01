@@ -8,11 +8,12 @@ from bs4 import BeautifulSoup
 class NSA:
 
     def __init__(self):
-        """ More recent module, kinda neatly written. Based on Dutch
-        website. """
+        """ More recent module, kinda neatly written, but works very slow
+        relatively to crude approach. Based on Dutch website. """
         self.keys = ['NSA', 'Snowden', 'FBI', 'privacy']
 
     def grab_daily(self):
+        """ Grabs todays articles from t.net. """
         soup, res = BeautifulSoup(urlopen('http://www.tweakers.net/')), []
 
         for hl in soup.findAll(attrs={'class': compile(r".*\bhighlights\b.*")}):
@@ -25,7 +26,7 @@ class NSA:
             return "Corrupted cores! We're in luck."
 
     def search_daily(self, res):
-
+        """ Searches heap for keywords and yields these to return. """
         newres = []
         for art in res:
             soup = BeautifulSoup(urlopen(art))

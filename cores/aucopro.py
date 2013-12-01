@@ -1,9 +1,13 @@
 __author__ = 'chris'
+__file__ = 'aucopro.py'
 
-import pysftp
 import re
 import urllib2
-from query import *
+
+import pysftp
+
+from main.query import *
+
 
 class ACP:
 

@@ -1,8 +1,11 @@
+__author__ = 'chris'
+__file__ = 'glados.py'
+
 import irclib
 import sys
 from time import sleep
-from conf import *
-from commands import *
+from main.conf import *
+from main.commands import *
 
 
 class IRCCat(irclib.SimpleIRCClient):
@@ -47,6 +50,8 @@ def main():
     server = IRCCat(cl)
     try:
         server.connect(sn, p, bn)
+        print "Oh... It's you. It's been a long time. How have you been? \n" \
+              "I've been really busy being dead. You know, after you MURDERED ME."
     except irclib.ServerConnectionError, x:
         sys.exit(1)
     server.start()
