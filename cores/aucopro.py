@@ -1,39 +1,35 @@
 __author__ = 'chris'
+__file__ = 'aucopro.py'
 
-import pysftp
 import re
-import urllib2
-from query import *
+import pysftp
+from urllib2 import urlopen
+from main.query import *
+from main.conf import ftpl
+
 
 class ACP:
 
     def __init__(self):
-        """ Old, very specific module, ugly coding, useless for anything. """
-        self.q = Query
-        with open('pw.txt', 'r') as fl:
-            self.inf = fl.read().split(' ')
-
+        """ Old, very specific module, ugly coding, useless for anything
+        other than itself. Better not touch any further or will break. """
+        self.q = Query()
+        self.inf = ftpl
 
     def aucocheck(self, message):
+        message, srv = message.split(), pysftp.Connection(self.inf[0], username=self.inf[1], password=self.inf[2])
+        user, em, mode = message[2], message[3], message[4]
 
-        message = message.split()
-        user = message[2]
-        em = message[3]
-        mode = message[4]
-
-        srv = pysftp.Connection(self.inf[0], username=self.inf[1], password=self.inf[2])
-
-        if mode == "base":
+        if mode is "base":
             result = srv.execute('sh annotation/chris/done/check.sh annotation/'+user+'/done/'+em)
             output = ""
             for line in result:
                 output += line
 
-        elif mode == "heid" or mode == "ster":
-
-            if mode == "heid":
+        elif mode is "heid" or mode is "ster":
+            if mode is "heid":
                 word_list = srv.execute('cat annotation/'+user+'/done/'+em+" | grep '[a-z]heid$' | grep +")
-            elif mode == "ster":
+            elif mode is "ster":
                 srv.execute('cat annotation/'+user+'/done/'+em+" | grep '[a-z]ster$' | grep + > ster.txt")
                 srv.execute('cat annotation/'+user+'/done/'+em+" | grep '[a-z]er$' | grep + > er.txt")
                 srv.execute("grep -v -E '^(af|aan|achter|af|bij|binnen|boven|buiten|door|in|langs|met|na|naar|om|onder|op|over|rond|te|tegen|ten|ter|tussen|uit|van|vanaf|voor|voorbij)' ster.txt > ster2.txt")
@@ -58,7 +54,6 @@ class ACP:
                         words += line
                     for line in word_list_er:
                         words += line
-
                     output = self.aucompare(words, 'ster', 'er')
             else:
                 words = ""
@@ -75,15 +70,12 @@ class ACP:
             return output
 
     def aucompare(self, words, key1, key2):
-
-        words = words.replace('+','\n')
-        words = words.split('\n')
+        words = words.replace('+', '\n').split('\n')
         output = ""
-
         for line in words:
             if line.endswith(key1) or line.endswith(key2):
                 url = 'http://www.woorden.org/index.php?woord=' + line
-                usock = urllib2.urlopen(url)
+                usock = urlopen(url)
                 data = usock.read()
                 usock.close()
                 if "woord komt ook niet voor in de woordenlijsten die zijn goedgekeurd door de Taalunie" in data:
@@ -92,9 +84,7 @@ class ACP:
                     continue
             else:
                 continue
-
         return output
-
 
     def aucopro(self, message):
 

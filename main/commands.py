@@ -1,19 +1,22 @@
 __author__ = 'chris'
+__file__ = 'commands.py'
 
-from twemo import *
-from wiki import *
-from urban import *
-from aucopro import *
-from nsanews import *
+import io
+import random
 from sys import exit
 
+from cores.twemo import *
+from cores.wiki import *
+from cores.urban import *
+from cores.aucopro import *
+from cores.nsanews import *
 
 class CmdStrap:
 
     def own(self, message, sender):
 
         if message.find("help") != -1:
-            return "Version 1.1.7 - 13.11 \n" \
+            return "Version 1.2.0 - 13.12 \n" \
                    "Code viewable on https://github.com/fazzeh/PyDOS \n" \
                    "AuCoPro: \t\t\t glados aucopro [word] \n" \
                    "AuCoPro Check: \t\t glados aucocheck [user] [em##]\n \t\t\t\t\t [base/heid/ster] \n" \
@@ -22,14 +25,14 @@ class CmdStrap:
                    "Twitter Emos: \t\t glados twemo [query] \n" \
                    "NSA News: \t\t\t glados nsa \n"
 
+        elif message.find("914D05") != -1:
+            exit(0)
+
         elif message.find("cube") != -1:
             return self.get_line("cube")
 
         elif message.find("goodbye") != -1:
             return self.get_line("leave")
-
-        elif message.find("914D05") != -1:
-            exit(0)
 
         elif message.find("aucopro") != -1:
             acp = ACP()
@@ -56,10 +59,14 @@ class CmdStrap:
             return nsa.grab_daily()
         
         else:
-            return 'pass'
+            return self.quote()
+
+    def quote(self):
+        quo = "\n".join(io.open("glados_quotes.txt", "r").readlines()).split("\n\n")
+        for q in quo[random.randint(0, len(quo)-1)].split("\n"):
+            return q
 
     def gen(self, message, sender):
-
         if message.find("mogge") != -1:
             return "Hello, test subject "+str(hash(sender))+"."
 

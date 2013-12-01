@@ -1,8 +1,12 @@
-from twitter import *
-from query import *
+__author__ = 'chris'
+__file__ = 'twemo.py'
+
 import re
 import codecs
+from twitter import *
 from collections import Counter
+from main.query import *
+
 
 class Twemo:
 
