@@ -1,7 +1,11 @@
 __author__ = 'chris'
 __file__ = 'query.py'
 
+
 class Query:
+
+    def __init__(self):
+        pass
 
     def search(self, message):
         search = message.split()

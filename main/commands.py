@@ -28,7 +28,7 @@ class CmdStrap:
         elif message.find("914D05") != -1:
             exit(0)
 
-        elif message.find("cube") !=W -1:
+        elif message.find("cube") != -1:
             return self.get_line("cube")
 
         elif message.find("goodbye") != -1:

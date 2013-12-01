@@ -1,11 +1,12 @@
 __author__ = 'chris'
 __file__ = 'twemo.py'
 
-from twitter import *
-from query import *
 import re
 import codecs
+from twitter import *
 from collections import Counter
+from main.query import *
+
 
 class Twemo:
 

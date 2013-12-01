@@ -1,7 +1,6 @@
 __author__ = 'chris'
 
 from urllib2 import urlopen
-
 from main.query import *
 
 
