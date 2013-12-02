@@ -62,7 +62,7 @@ class CmdStrap:
             return self.quote()
 
     def quote(self):
-        quo = "\n".join(io.open("glados_quotes.txt", "r").readlines()).split("\n\n")
+        quo = "\n".join(io.open("../cores/glados_quotes.txt", "r").readlines()).split("\n\n")
         for q in quo[random.randint(0, len(quo)-1)].split("\n"):
             return q
 

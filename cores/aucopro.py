@@ -5,7 +5,7 @@ import re
 import pysftp
 from urllib2 import urlopen
 from main.query import *
-from main.conf import ftpl
+from main.conf import *
 
 
 class ACP:
