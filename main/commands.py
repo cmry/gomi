@@ -4,7 +4,7 @@ __file__ = 'commands.py'
 import io
 import random
 from sys import exit
-
+from os import getcwd, path
 from cores.twemo import *
 from cores.wiki import *
 from cores.urban import *
@@ -62,7 +62,7 @@ class CmdStrap:
             return self.quote()
 
     def quote(self):
-        quo = "\n".join(io.open("glados_quotes.txt", "r").readlines()).split("\n\n")
+        quo = "\n".join(io.open(path.join(getcwd(), "main/glados_quotes.txt"), "r").readlines()).split("\n\n")
         for q in quo[random.randint(0, len(quo)-1)].split("\n"):
             return q
 
