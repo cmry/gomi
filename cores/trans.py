@@ -11,7 +11,7 @@ class Translate:
         self.q = Query()
 
     def goslate(self, message, log):
-        logt = log.push(int(self.q.search(message).split(' ')[0]))
+        logt = log.push(-int(self.q.search(message).split(' ')[0]))
         gs = goslate.Goslate()
         for x in range(0, len(logt)-1):
             try:
