@@ -6,7 +6,7 @@ import random
 from sys import exit
 
 from cores.twemo import *
-#from cores.wiki import *
+from cores.wiki import *
 from cores.urban import *
 from cores.aucopro import *
 from cores.nsanews import *
@@ -44,9 +44,9 @@ class CmdStrap:
             acp = ACP()
             return acp.aucocheck(message)
 
-        #elif message.find("wiki") != -1:
-        #    wiki = Wiki()
-        #    return wiki.wiki(message)
+        elif message.find("wiki") != -1:
+            wiki = Wiki()
+            return wiki.wiki(message)
 
         elif message.find("twemo") != -1:
             twemo = Twemo(message, False)
