@@ -30,7 +30,7 @@ class IRCCat(irclib.SimpleIRCClient):
             Also handles pushing commands and reactions through decision tree. """
         try:
             cmd = CmdStrap()
-            message, sender, nick = evt.arguments()[0], evt.source()[0:evt.source().find("!")], evt.source.nick
+            message, nick = evt.arguments()[0], evt.source()[0:evt.source().find("!")]
             self.log.feed(message)
             if message.lower().find("glados") != -1:
                 self.talk(cmd.own(message, nick))
@@ -39,17 +39,17 @@ class IRCCat(irclib.SimpleIRCClient):
             del cmd
         except Exception as e:
             #prevent disconnects due to crappy programming
-            self.talk("The cake is a lie.")
+            self.talk("The cake is a lie."); print e
 
     def on_privmsg(self, con, evt):
         try:
             cmd = CmdStrap()
-            message, con, nick = evt.arguments()[0], self.connection, evt.source.nick
+            message, con, nick = evt.arguments()[0], self.connection, evt.source()[0:evt.source().find("!")]
             if message.lower().find("glados") != -1:
                 self.talk(cmd.own(message, self.log), nick)
             del cmd
         except Exception as e:
-            pass
+            print e
 
     def talk(self, msg, tg=None):
         """ Simple privmsg command, make sure talk msg are strings!!! """

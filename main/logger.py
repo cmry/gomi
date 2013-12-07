@@ -7,10 +7,10 @@ class Log:
         self.stack = []
 
     def feed(self, message):
-        if len(self.stack) is 5:
+        if len(self.stack) is 50:
             self.stack.pop(0)
-        if len(self.stack) < 5:
+        if len(self.stack) < 50:
             self.stack.append(message)
 
-    def push(self):
-        return self.stack
+    def push(self, amt):
+        return self.stack[amt:]

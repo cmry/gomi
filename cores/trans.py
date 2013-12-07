@@ -11,12 +11,11 @@ class Translate:
         self.q = Query()
 
     def goslate(self, message, log):
-        lang = self.q.search(message).split(' ')[2]
+        logt = log.push(int(self.q.search(message).split(' ')[0]))
         gs = goslate.Goslate()
-        for x in range(0, len(log)):
+        for x in range(0, len(logt)-1):
             try:
-                log[x] = gs.translate(log[x], lang)
+                logt[x] = gs.translate(logt[x], 'en')
             except Exception as e:
-                print e
                 return "Corrupted cores! We're in luck."
-        return log
+        return '\n'.join(logt)

@@ -6,7 +6,7 @@ import random
 from sys import exit
 
 from cores.twemo import *
-from cores.wiki import *
+#from cores.wiki import *
 from cores.urban import *
 from cores.aucopro import *
 from cores.nsanews import *
@@ -25,7 +25,7 @@ class CmdStrap:
                    "Urban Dictionary: \t glados urban [query] ([number]) \n" \
                    "Twitter Emos: \t\t glados twemo [query] \n" \
                    "NSA News: \t\t\t glados nsa \n" \
-                   "Goslate: \t\t\t glados goslate [lang] \n"
+                   "Goslate: \t\t\t glados goslate [lines] \n"
 
         elif message.find("914D05") != -1:
             exit(0)
@@ -44,9 +44,9 @@ class CmdStrap:
             acp = ACP()
             return acp.aucocheck(message)
 
-        elif message.find("wiki") != -1:
-            wiki = Wiki()
-            return wiki.wiki(message)
+        #elif message.find("wiki") != -1:
+        #    wiki = Wiki()
+        #    return wiki.wiki(message)
 
         elif message.find("twemo") != -1:
             twemo = Twemo(message, False)
