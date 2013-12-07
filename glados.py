@@ -36,8 +36,7 @@ class IRCCat(irclib.SimpleIRCClient):
             del cmd
         except Exception as e:
             #prevent disconnects due to crappy programming
-            print e
-            self.talk("The cake is a lie.")
+            self.talk("The cake is a lie."); print e
 
     def talk(self, msg):
         """ Simple privmsg command, make sure talk msg are strings!!! """
