@@ -6,7 +6,7 @@ class Log:
     def __init__(self):
         self.stack = []
 
-    def feed(self, sender, message):
+    def feed(self, message, sender):
         if len(self.stack) is 50:
             self.stack.pop(0)
         if len(self.stack) < 50:
