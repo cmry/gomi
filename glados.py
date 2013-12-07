@@ -31,7 +31,7 @@ class IRCCat(irclib.SimpleIRCClient):
         try:
             cmd = CmdStrap()
             message, nick = evt.arguments()[0], evt.source()[0:evt.source().find("!")]
-            self.log.feed(message)
+            self.log.feed(message, nick)
             if message.lower().find("glados") != -1:
                 self.talk(cmd.own(message, nick))
             else:
