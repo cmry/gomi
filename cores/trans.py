@@ -13,7 +13,7 @@ class Translate:
     def goslate(self, message, log):
         logt = log.push(-int(self.q.search(message).split(' ')[0]))
         gs = goslate.Goslate()
-        for x in range(0, len(logt)-1):
+        for x in range(0, len(logt)):
             try:
                 logt[x] = gs.translate(logt[x], 'en')
             except Exception as e:
