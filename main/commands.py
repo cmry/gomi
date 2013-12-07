@@ -10,6 +10,7 @@ from cores.wiki import *
 from cores.urban import *
 from cores.aucopro import *
 from cores.nsanews import *
+from cores.trans import *
 
 class CmdStrap:
 
@@ -23,7 +24,8 @@ class CmdStrap:
                    "Wikipedia: \t\t\t glados wiki [query] \n" \
                    "Urban Dictionary: \t glados urban [query] ([number]) \n" \
                    "Twitter Emos: \t\t glados twemo [query] \n" \
-                   "NSA News: \t\t\t glados nsa \n"
+                   "NSA News: \t\t\t glados nsa \n" \
+                   "Goslate: \t\t\t glados goslate [lines] \n"
 
         elif message.find("914D05") != -1:
             exit(0)
@@ -57,6 +59,10 @@ class CmdStrap:
         elif message.find("nsa") != -1:
             nsa = NSA()
             return nsa.grab_daily()
+
+        elif message.find("goslate") != -1:
+            trans = Translate()
+            return trans.goslate(message, sender)
         
         else:
             return self.quote()
