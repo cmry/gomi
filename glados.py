@@ -6,6 +6,7 @@ import sys
 from time import sleep
 from main.conf import *
 from main.commands import *
+from main.logger import *
 
 
 class IRCCat(irclib.SimpleIRCClient):
@@ -14,6 +15,7 @@ class IRCCat(irclib.SimpleIRCClient):
         """ Initializing the class, setting up the channel from conf """
         irclib.SimpleIRCClient.__init__(self)
         self.tag = chl
+        self.log = Log()
 
     def on_welcome(self, con, evt):
         """ Used for joining, can't be simplified or talk function will break. """
@@ -28,21 +30,34 @@ class IRCCat(irclib.SimpleIRCClient):
             Also handles pushing commands and reactions through decision tree. """
         try:
             cmd = CmdStrap()
-            message, sender = evt.arguments()[0], evt.source()[0:evt.source().find("!")]
+            message, nick = evt.arguments()[0], evt.source()[0:evt.source().find("!")]
+            self.log.feed(message, nick)
             if message.lower().find("glados") != -1:
-                self.talk(cmd.own(message, sender))
+                self.talk(cmd.own(message, nick))
             else:
-                self.talk(cmd.gen(message, sender)) if cmd.gen(message, sender) else sleep(1)
+                self.talk(cmd.gen(message, nick)) if cmd.gen(message, nick) else sleep(1)
             del cmd
         except Exception as e:
             #prevent disconnects due to crappy programming
-            print e
-            self.talk("The cake is a lie.")
+            self.talk("The cake is a lie."); print e
 
-    def talk(self, msg):
+    def on_privmsg(self, con, evt):
+        try:
+            cmd = CmdStrap()
+            message, con, nick = evt.arguments()[0], self.connection, evt.source()[0:evt.source().find("!")]
+            if message.lower().find("glados") != -1:
+                self.talk(cmd.own(message, self.log), nick)
+            del cmd
+        except Exception as e:
+            print e
+
+    def talk(self, msg, tg=None):
         """ Simple privmsg command, make sure talk msg are strings!!! """
         for l in msg.split("\n"):
-            self.connection.privmsg(self.tag, l)
+            if tg is None:
+                self.connection.privmsg(self.tag, l)
+            else:
+                self.connection.privmsg(tg, l)
 
     def on_disconnect(self, con, evt):
         """ On disconnect, try reloading. Not working? """
