@@ -19,13 +19,14 @@ class CmdStrap:
         if message.find("help") != -1:
             return "Version 1.2.0 - 13.12 \n" \
                    "Code viewable on https://github.com/fazzeh/PyDOS \n" \
-                   "AuCoPro: \t\t\t glados aucopro [word] \n" \
-                   "AuCoPro Check: \t\t glados aucocheck [user] [em##]\n \t\t\t\t\t [base/heid/ster] \n" \
-                   "Wikipedia: \t\t\t glados wiki [query] \n" \
-                   "Urban Dictionary: \t glados urban [query] ([number]) \n" \
-                   "Twitter Emos: \t\t glados twemo [query] \n" \
-                   "NSA News: \t\t\t glados nsa \n" \
-                   "Goslate: \t\t\t glados goslate [lines] \n"
+                   "AuCoPro:            glados aucopro [word] \n" \
+                   "AuCoPro Check:      glados aucocheck [user] [em##]\n" \
+                   "                                     [base/heid/ster] \n" \
+                   "Wikipedia:          glados wiki [query] \n" \
+                   "Urban Dictionary:   glados urban [query] ([number]) \n" \
+                   "Twitter Emos:       glados twemo [query] \n" \
+                   "NSA News:           glados nsa \n" \
+                   "Goslate:            glados goslate [lines] \n"
 
         elif message.find("914D05") != -1:
             exit(0)
