@@ -69,7 +69,8 @@ class TwkScraper:
         self.art.content['text'] = '\n'.join(textl)
 
     def fetch_subj(self, subjfield):
-        """ Grabs subjects from subject field. """
+        """ Grabs subjects from subject field. Sometimes
+        not present, catch error. """
         subj = subjfield.find("div", {"class": "rbEntitylist"})
 
         subjl = []
