@@ -73,8 +73,11 @@ class TwkScraper:
         subj = subjfield.find("div", {"class": "rbEntitylist"})
 
         subjl = []
-        for a in subj.findAll('a'):
-            subjl.append(self.fetch_tagcont(a))
+        try:
+            for a in subj.findAll('a'):
+                subjl.append(self.fetch_tagcont(a))
+        except AttributeError:
+            subjl.append('')
 
         self.art.subj = ', '.join(subjl)
 
