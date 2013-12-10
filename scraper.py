@@ -40,8 +40,7 @@ class Scraper:
         self.scrape_arts(self.arts, prod)
 
     def call_cats(self, site):
-        """ Determines the categories that will be visited by the
-            scraper. """
+        """ Determines the categories that will be visited by the scraper. """
         if site is 't':
             cats = ['nieuws']
             return cats
