@@ -70,19 +70,18 @@ class CmdStrap:
             return self.quote(message, sender)
 
     def quote(self, message, sender):
-        l = Language()
-        q = l.analyse_msg(message, sender)
-        if q:
+        quo = "\n".join(io.open("glados_quotes.txt", "r").readlines()).split("\n\n")
+        for q in quo[random.randint(0, len(quo)-1)].split("\n"):
             return q
-        else:
-            quo = "\n".join(io.open("glados_quotes.txt", "r").readlines()).split("\n\n")
-            for q in quo[random.randint(0, len(quo)-1)].split("\n"):
-                return q
 
     def gen(self, message, sender):
         if message.find("mogge") != -1:
             return "Hello, test subject "+str(hash(sender))+"."
-
+        else:
+            l = Language()
+            q = l.analyse_msg(message, sender)
+            if q:
+                return q
     def get_line(self, command):
         if command == "leave":
             return "When I said \"deadly neurotoxin,\" the \"deadly\" was in massive sarcasm quotes. I could take a bath in this stuff. Put in on cereal, rub it right into my eyes. Honestly, it's not deadly at all... to *me.* You, on the other hand, are going to find its deadliness ... a lot less funny."
