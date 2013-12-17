@@ -11,6 +11,7 @@ from cores.urban import *
 from cores.aucopro import *
 from cores.nsanews import *
 from cores.trans import *
+from cores.lang import *
 
 class CmdStrap:
 
@@ -65,12 +66,17 @@ class CmdStrap:
             return trans.goslate(message, sender)
         
         else:
-            return self.quote()
+            return self.quote(message, sender)
 
-    def quote(self):
-        quo = "\n".join(io.open("glados_quotes.txt", "r").readlines()).split("\n\n")
-        for q in quo[random.randint(0, len(quo)-1)].split("\n"):
+    def quote(self, message, sender):
+        l = Language()
+        q = l.analyse_msg(message, sender)
+        if q:
             return q
+        else:
+            quo = "\n".join(io.open("glados_quotes.txt", "r").readlines()).split("\n\n")
+            for q in quo[random.randint(0, len(quo)-1)].split("\n"):
+                return q
 
     def gen(self, message, sender):
         if message.find("mogge") != -1:
