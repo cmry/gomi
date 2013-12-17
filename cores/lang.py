@@ -23,7 +23,7 @@ class Language:
                  'sterf':                       "Zet me on hold, <name> doe dimmen, val even dood of dat soort dingen",
                  'machine urine':               "Nou rest in peace, <name> zwem in urine \n" +
                                                 "Kleine shout-out naar de Machine",
-                 'moeder wiepen':            "En een kleine shout-out, nee, fuck it, doe een grote \n"
+                 'moeder wiepen':               "En een kleine shout-out, nee, fuck it, doe een grote \n"
                                                 "naar <sname>'s moeder in d'r blootje \n Ze is niet echt mijn type " +
                                                 "hoor, maar ik zou het wel wiepen hoor",
                  'dom som ontelbaar':           "Jullie niggers zijn dommetjes, " +
@@ -43,10 +43,11 @@ class Language:
                  'exemplaar hilarisch ' +
                  'kanarie':                     "Exemplarisch, formularisch \n Een hoop lol, de vorm hilarisch \n" +
                                                 "Gele wervelwind, de storm kanarisch",
-                 'banaan':                      "Banaan in <names>'s oor hoort het commentaar niet",
+                 'banaan':                      "Banaan in <name>'s oor hoort het commentaar niet",
                  'jas das pinpas' +
-                 'drankje':                     "Jasje, dasje, pinpasje \n <names>'s drankje, in het handje \n" +
+                 'drankje':                     "Jasje, dasje, pinpasje \n <name>'s drankje, in het handje \n" +
                                                 "Buitenlandje, binnenlandje \n Pimpendansje, in het Fransje",
+                 'frans':                       "In het Fransje, oui oui",
                  'win':                         "<name>, goddammit nummer 1 \n Neem iedereen in mijn slipstream mee",
                  'element systeem':             "Het hele periodieke systeem \n heeft niks op het element <name>ley",
                  'hardgaan kwardraat' +
