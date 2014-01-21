@@ -10,15 +10,18 @@ import sys
 
 class Tagger:
 
-    def __init__(self, struc, wsj):
+    def __init__(self, struc, args):
         """ This class extracts the required information from the gs file
             and given results (struc) files and wsj length, and calculates
             the scores for correctly learned POS tags. FTUK! """
 
+        self.args = args
+        self.col = self.get_col()
+
         # cut longer than wsj(x) variable
         self.gs, tgs = [], open(getcwd()+'/corp/wsj_menno.gold.fix3.txt', 'r').readlines()
         for line in tgs:
-            if len(line.split(' @@@ ')[0].split(' ')) <= wsj:
+            if len(line.split(' @@@ ')[0].split(' ')) <= args['--wsjlen']:
                 self.gs.append(line)
 
         # output files do not contain spaces, fix for cc.py
@@ -84,7 +87,7 @@ class Tagger:
         D, D2, D3 = {}, self.build_D(self.gs, 'clean'), self.build_D(self.struc, 'clean')
         errs, tlist, flist, ambs = [], [], [], 0
         for K2, V2 in D2.iteritems():
-            if len(V2) > 1:  # skip ambiguous word
+            if len(V2) > 1 and not self.args['--amb']:  # skip ambiguous word
                 ambs += 1
             else:
                 D[K2] = list()
@@ -110,6 +113,8 @@ class Tagger:
     def build_D5(self):
         """ Dick 5 is the result dictionary of Dick 4 and Dick 1, which
             includes all the POS tags and a True, False and Total score. """
+
+        # the --cor --tot --inc parameters should still be implemented here!
 
         D = {}
         for line in self.gs:
@@ -141,24 +146,37 @@ class Tagger:
                      "Seen items: ": len(checkl)})
         return D
 
-    def perc_D5(self, D5):
-        tot = [sum(i) for i in zip(*D5.values())][1]  # should be 2
+    def get_col(self, c={}):
+        for a, b in self.args.iteritems():
+            if findall('--(cor|inc|tot)$', a) and b:
+                c[a] = b
+        return OrderedDict(sorted(c.items(), key=lambda (k, v): k, reverse=False))
 
+    def perc_D5(self, D5, tot=0):
         for K5, V5 in D5.iteritems():
             try:
-                # Menno only asked for %correct and %correct of total, d5[K5][1] should be [2] >> also add:
-                D5[K5].append(round(float(D5[K5][0])/float(D5[K5][1]), 4))  # d5[K5][1] = round(float(d5[K5][1])
-                D5[K5].append(round(float(D5[K5][0])/float(tot), 4))        # /float(d5[K5][2]), 4)
+                if ('--tot' in self.col and '--inc' in self.col) or ('--tot' in self.col and '--cor' in self.col):
+                    tot = int([sum(i) for i in zip(*D5.values())][len(self.col)-1])
+                    D5[K5].append(round(float(D5[K5][0]) / float(tot), 4))
+                    if '--cor' in self.col:
+                        D5[K5].append(round(float(D5[K5][self.col.keys().index('--cor')])
+                                            / float(D5[K5][len(self.col)-1]), 4))
+                    if '--inc' in self.col:
+                        D5[K5][1] = round(float(D5[K5][self.col.keys().index('--inc')])
+                                          / float(D5[K5][len(self.col)-1]), 4)
+                else:
+                    exit("ERROR: Percentage of what?!")
+
             except ZeroDivisionError:
-                D5[K5][0] = 0.0  # d5[K5][1] = 0.0
-                D5[K5][1] = 0.0  # should be 2
+                for i in range(0, len(D5[K5])):
+                    D5[K5][i] = 0.0
 
         self.logger({"Total structs GS: ": tot,
                      "-------------------------": ""})
         return D5
 
-    def gen_output(self, args, D5P=None):
-        labels = ['correct', 'total', '% correct', '% correct of total']
+    def gen_output(self):
+        labels, args = ['correct', 'total', '% correct', '% correct of total'], self.args
         if args['--perc'] and not args['--ngr']:
             M = self.perc_D5(OrderedDict(sorted(self.build_D5().items(), key=lambda (k, v): v[0], reverse=True)))
         elif not args['--perc'] and args['--ngr']:
@@ -172,7 +190,7 @@ class Tagger:
         D5 = OrderedDict(sorted(M.items(), key=lambda (k, v): v[0], reverse=True))
 
         klist = []
-        for tag in D5P.keys():
+        for tag in D5.keys():
             tag = tag.replace('[', '\[')
             tag = tag.replace(']', '\]')
             klist.append(tag)
@@ -187,9 +205,9 @@ def main(args):
 
         for corp in corp_list:
             fl.write("% "+corp+" ------------------------------------------------------------------------ \n")
-            tagger = Tagger(getcwd()+'/corp/'+corp, args['--wsjlen'])
+            tagger = Tagger(getcwd()+'/corp/'+corp, args)
 
-            D5P, klist, labels = tagger.gen_output(args)
+            D5P, klist, labels = tagger.gen_output()
             tagger.frame_ord(D5P.values(), klist, labels).to_latex(fl)
 
             fl.write("\n")
