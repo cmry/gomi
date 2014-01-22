@@ -167,10 +167,10 @@ class Tagger:
             for k in klist:
                 del D[k]
 
-        vlist = []
-        [vlist.append(self.col.keys().index('--tot')) for v in D.itervalues()]
+        # TODO: add only list n-top items
+        #vlist = []
+        #[vlist.append(self.col.keys().index('--tot')) for v in D.itervalues()]
         # for i in sorted(vlist):
-
 
         self.logd.update({"Misc Err: ": len(errs),
                           "Total sents GS: ": len(D1),
@@ -200,24 +200,27 @@ class Tagger:
                     exit("ERROR: Percentage of what?!")
             except ZeroDivisionError:
                 for i in range(0, len(D5[K5])):
-                    D5[K5][i] = 0
+                    D5[K5].append(0.0)
 
         self.logd.update({"Total structs GS: ": tot,
                           "--------------------------": ""})
+
+        for key, value in D5.iteritems():
+            print value
         return D5
 
     def gen_output(self):
-        labels, args = [], self.args
+        M, labels, args = self.build_D5(), [], self.args
 
-        M = self.build_D5()
         [labels.append(k[2:]) for k in self.col.keys()]; [labels.append('% '+k[2:]) for k in self.col.keys()]
-        sortk = self.col.keys().index('--'+args['--sortk']) if not args['--perc'] else self.col.keys().index('--'+args['--sortk'])+len(self.col)
+        sortk = self.col.keys().index('--'+args['--sortk']) if not args['--perc'] else \
+                self.col.keys().index('--'+args['--sortk'])+len(self.col)
 
         if args['--perc']:
             M = self.perc_D5(OrderedDict(sorted(M.items(), key=lambda (k, v): v[0], reverse=True)))
         else:
             labels = labels[:-len(self.col.keys())]
-        # TODO: fix the index error that sortk yields !!
+
         D5 = OrderedDict(sorted(M.items(), key=lambda (k, v): v[sortk], reverse=True))
         klist = [tag.replace('$', '\$').replace('[', '$\lbrack$').replace(']', '$\rbrack$') for tag in D5.keys()]
         return D5, klist, labels
