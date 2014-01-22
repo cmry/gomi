@@ -5,14 +5,14 @@ __version__ = 'Version 22.01'  # update by date on subclass change
 __doc__ = """ FTUK!
 
  Usage:
-    ftuk [-v] freq [-cit] <input>... --wsjlen=I [--perc] [--tex] [--ngr=N] [--amb]
+    ftuk [-v] freq [-cit] <input>... --wsjlen=I --sortk=key [--top=N] [--perc] [--tex] [--ngr=N] [--amb]
     ftuk [-v] fix <input>
     ftuk (-h | --help)
     ftuk --version
 
  Arguments:
     freq                outputs the POS frequencies for one or multiple
-                        corpora to the oupt/res.tex file
+                        corpora to terminal or the oupt/res.tex file
     fix                 recompiles the old WSJ corpus to a format usable
                         by ABL, old function, better not use
  Freq:
@@ -21,6 +21,8 @@ __doc__ = """ FTUK!
     -t, --tot               list the column with the total amount of tags
     --wsjlen=I          cuts from I off the golden standard file to make
                         it compatible with wsj I-length of sentences
+    --sortk=key         sort the outputted table on key (cor, inc, tot)
+    --top=N             output only the top N items
     --perc              include the frequencies of each tag in percentage
     --tex               output in TeX to outp folder, default is print
     --ngr=N             get the N-gram frequencies of each tag (e.g. N=2)
@@ -36,8 +38,8 @@ __doc__ = """ FTUK!
 import sys
 from docopt import docopt  # install with pip
 from os import getcwd
-import tagger
-import cc
+from mods import tagger
+from mods import cc
 
 
 class Ftuk():
