@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 __author__ = 'chris'
-__version__ = 'Version 22.01'  # update by date on subclass change
+__version__ = 'Version 23.01'  # update by date on subclass change
 __doc__ = """ FTUK!
 
  Usage:

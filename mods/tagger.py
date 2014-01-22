@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 __author__ = 'chris'
-__version__ = 'Version 22.01'
+__version__ = 'Version 23.01'
 
 from re import sub, findall
 from pandas import DataFrame
@@ -22,9 +22,9 @@ class Tagger:
         self.logd = {}
 
         # cut longer than wsj(x) variable
-        self.gs, tgs = [], open(getcwd()+'/corp/wsj_menno.gold.fix3.txt', 'r').readlines()
+        self.gs, tgs = [], open(getcwd()+'/corp/wsj10.gold.fix', 'r').readlines()
         for line in tgs:
-            if len(line.split(' @@@ ')[0].split(' ')) <= int(args['--wsjlen']):
+            if len(line.split(' @@@ ')[0].split(' ')) <= int(findall('[0-9]+', struc)[0]):
                 self.gs.append(line)
 
         # output files do not contain spaces, fix for cc.py
