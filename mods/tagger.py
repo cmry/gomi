@@ -117,7 +117,7 @@ class Tagger:
                           "Branch Err: ": len(errs)})
         return D
 
-    def build_D5(self):
+    def build_D5(self, top=None):
         """ Dick 5 is the result dictionary of Dick 4 and Dick 1, which
             includes all the POS tags and optionally a Correct, Incorrect
             and Total score. These can be altered by the CLI. """
@@ -125,24 +125,52 @@ class Tagger:
         D, D1, D4 = {}, self.build_D(self.gs), self.build_D4()
         errs, checkl = [], []
 
-        for tag in set(findall('\[[A-Z\$]+]', str(self.gs))):
-            if tag not in D: D[tag] = [0 for _ in self.col]  # errors in outer scope ><
+        if not self.args['--ngr']:
+            for tag in set(findall('\[[A-Z\$]+]', str(self.gs))):
+                if tag not in D: D[tag] = [0 for _ in self.col]  # errors in outer scope ><
+        else:
+            for v in D1.itervalues():
+                for tag in range(0, len(v)):
+                    try:
+                        n = ' '.join(v[0][tag-int(self.args['--ngr']):tag])
+                        if n not in D and '\n' not in n: D[n] = [0 for _ in self.col]
+                    except KeyError:
+                        continue
 
         for K1, V1 in D1.iteritems():
             try:
                 V4 = D4[K1]
                 checkl.append(V4)
                 for i in range(0, len(V4)-1):  # -1 to ignore \n
-                    if V4[i] and '--cor' in self.col:
-                        D[V1[0][i]][self.col.keys().index('--cor')] += 1
-                    elif '--inc' in self.col:
-                        D[V1[0][i]][self.col.keys().index('--inc')] += 1
-                    if '--tot' in self.col:
-                        D[V1[0][i]][self.col.keys().index('--tot')] += 1
+                    if not self.args['--ngr']:
+                        if V4[i] and '--cor' in self.col:
+                            D[V1[0][i]][self.col.keys().index('--cor')] += 1
+                        elif '--inc' in self.col:
+                            D[V1[0][i]][self.col.keys().index('--inc')] += 1
+                        if '--tot' in self.col:
+                            D[V1[0][i]][self.col.keys().index('--tot')] += 1
+                    else:
+                        if V4[i-int(self.args['--ngr']):i].count(True) is 2 and '--cor' in self.col and self.args['--ngr']:
+                            D[' '.join(V1[0][i-int(self.args['--ngr']):i])][self.col.keys().index('--cor')] += 1
+                        elif '--inc' in self.col:
+                            D[' '.join(V1[0][i-int(self.args['--ngr']):i])][self.col.keys().index('--inc')] += 1
+                        if '--tot' in self.col:
+                            D[' '.join(V1[0][i-int(self.args['--ngr']):i])][self.col.keys().index('--tot')] += 1
             except KeyError as e:
                 # "Estimated volume was a moderate 3.5 million ounces" seems to
                 # error for some reason
                 errs.append(e)
+
+        if self.args['--ngr']:
+            klist = []
+            [klist.append(k) for k in D.iterkeys() if len(k.split(' ')) < int(self.args['--ngr'])]
+            for k in klist:
+                del D[k]
+
+        vlist = []
+        [vlist.append(self.col.keys().index('--tot')) for v in D.itervalues()]
+        # for i in sorted(vlist):
+
 
         self.logd.update({"Misc Err: ": len(errs),
                           "Total sents GS: ": len(D1),
@@ -181,17 +209,17 @@ class Tagger:
     def gen_output(self):
         labels, args = [], self.args
 
-        # TODO: implement n-gram
         M = self.build_D5()
         [labels.append(k[2:]) for k in self.col.keys()]; [labels.append('% '+k[2:]) for k in self.col.keys()]
+        sortk = self.col.keys().index('--'+args['--sortk']) if not args['--perc'] else self.col.keys().index('--'+args['--sortk'])+len(self.col)
+
         if args['--perc']:
             M = self.perc_D5(OrderedDict(sorted(M.items(), key=lambda (k, v): v[0], reverse=True)))
         else:
-            #del labels[-1*len(self.col.keys())]
             labels = labels[:-len(self.col.keys())]
-
-        D5 = OrderedDict(sorted(M.items(), key=lambda (k, v): v[0], reverse=True))
-        klist = [tag.replace('[', '$\lbrack$').replace(']', '$\rbrack$') for tag in D5.keys()]
+        # TODO: fix the index error that sortk yields !!
+        D5 = OrderedDict(sorted(M.items(), key=lambda (k, v): v[sortk], reverse=True))
+        klist = [tag.replace('$', '\$').replace('[', '$\lbrack$').replace(']', '$\rbrack$') for tag in D5.keys()]
         return D5, klist, labels
 
 
