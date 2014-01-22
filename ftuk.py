@@ -5,7 +5,7 @@ __version__ = 'Version 22.01'  # update by date on subclass change
 __doc__ = """ FTUK!
 
  Usage:
-    ftuk [-v] freq [-cit] <input>... --wsjlen=I --sortk=key [--top=N] [--perc] [--tex] [--ngr=N] [--amb]
+    ftuk [-v] freq [-cit] <input>... [--sortk=key] [--top=N] [--perc] [--tex] [--ngr=N] [--amb]
     ftuk [-v] fix <input>
     ftuk (-h | --help)
     ftuk --version
@@ -19,9 +19,8 @@ __doc__ = """ FTUK!
     -c, --cor               list the column with correctly learned tags
     -i, --inc               list the column with incorrectly learned tags
     -t, --tot               list the column with the total amount of tags
-    --wsjlen=I          cuts from I off the golden standard file to make
-                        it compatible with wsj I-length of sentences
-    --sortk=key         sort the outputted table on key (cor, inc, tot)
+    --sortk=key         specifically sort the outputted table on key
+                        (cor, inc, tot), not specified will sort on tot
     --top=N             output only the top N items
     --perc              include the frequencies of each tag in percentage
     --tex               output in TeX to outp folder, default is print

@@ -1,9 +1,10 @@
-from distutils.core import setup
+from setuptools import setup
 
 setup(
     name='Ftuk',
     version='22.01',
     packages=['mods'],
+    install_requires=['docopt'],
     url='https://www.github.com/fazzeh/ftuk',
     license='MIT',
     author='chris',
