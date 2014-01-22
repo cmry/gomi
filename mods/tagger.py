@@ -7,6 +7,7 @@ from re import sub, findall
 from pandas import DataFrame
 from collections import OrderedDict
 from os import getcwd
+from itertools import islice
 
 
 class Tagger:
@@ -117,7 +118,7 @@ class Tagger:
                           "Branch Err: ": len(errs)})
         return D
 
-    def build_D5(self, top=None):
+    def build_D5(self):
         """ Dick 5 is the result dictionary of Dick 4 and Dick 1, which
             includes all the POS tags and optionally a Correct, Incorrect
             and Total score. These can be altered by the CLI. """
@@ -167,11 +168,6 @@ class Tagger:
             for k in klist:
                 del D[k]
 
-        # TODO: add only list n-top items
-        #vlist = []
-        #[vlist.append(self.col.keys().index('--tot')) for v in D.itervalues()]
-        # for i in sorted(vlist):
-
         self.logd.update({"Misc Err: ": len(errs),
                           "Total sents GS: ": len(D1),
                           "Total sents ST: ": len(D4),
@@ -205,8 +201,6 @@ class Tagger:
         self.logd.update({"Total structs GS: ": tot,
                           "--------------------------": ""})
 
-        for key, value in D5.iteritems():
-            print value
         return D5
 
     def gen_output(self):
@@ -221,7 +215,7 @@ class Tagger:
         else:
             labels = labels[:-len(self.col.keys())]
 
-        D5 = OrderedDict(sorted(M.items(), key=lambda (k, v): v[sortk], reverse=True))
+        D5 = OrderedDict(sorted(islice(M.items(), 0, int(args['--top']) if args['--top'] else len(M)), key=lambda (k, v): v[sortk], reverse=True))
         klist = [tag.replace('$', '\$').replace('[', '$\lbrack$').replace(']', '$\rbrack$') for tag in D5.keys()]
         return D5, klist, labels
 
