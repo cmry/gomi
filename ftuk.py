@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
 __author__ = 'chris'
-__version__ = 'Version 1.2'
-__doc__ = """ Ftuk!
+__version__ = 'Version 22.01'  # update by date on subclass change
+__doc__ = """ FTUK!
 
  Usage:
-    ftuk [-v] freq --wsjlen=I [--cor] [--inc] [--tot] [--perc] [--ngr=N] [--amb] <input>...
+    ftuk [-v] freq [-cit] <input>... --wsjlen=I [--perc] [--tex] [--ngr=N] [--amb]
     ftuk [-v] fix <input>
     ftuk (-h | --help)
     ftuk --version
@@ -16,19 +16,20 @@ __doc__ = """ Ftuk!
     fix                 recompiles the old WSJ corpus to a format usable
                         by ABL, old function, better not use
  Freq:
-    --cor               list the column with correctly learned tags
-    --inc               list the column with incorrectly learned tags
-    --tot               list the column with the total amount of tags
+    -c, --cor               list the column with correctly learned tags
+    -i, --inc               list the column with incorrectly learned tags
+    -t, --tot               list the column with the total amount of tags
     --wsjlen=I          cuts from I off the golden standard file to make
                         it compatible with wsj I-length of sentences
     --perc              include the frequencies of each tag in percentage
+    --tex               output in TeX to outp folder, default is print
     --ngr=N             get the N-gram frequencies of each tag (e.g. N=2)
     --amb               allow ambiguous words to be incorporated in analysis
 
  Misc:
+    -h, --help              show this help message and exit
+    -v, --verbose           print status messages in terminal, or debug with -vv
     --version           show program's version number and exit
-    -h, --help          show this help message and exit
-    -v, --verbose       print status messages in terminal, or debug with -vv
 
 """
 
@@ -53,7 +54,7 @@ class Ftuk():
             tagger.main(args)
         elif args['fix']:
             cc.main()
-        exit("------- Finished! -------")
+        exit(" ------- Finished -------")
 
 
 def main():
