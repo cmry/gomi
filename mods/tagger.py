@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 __author__ = 'chris'
-__version__ = 'Version 22.01'
+__version__ = 'Version 23.01'
 
 from re import sub, findall
 from pandas import DataFrame
@@ -22,9 +22,9 @@ class Tagger:
         self.logd = {}
 
         # cut longer than wsj(x) variable
-        self.gs, tgs = [], open(getcwd()+'/corp/wsj_menno.gold.fix3.txt', 'r').readlines()
+        self.gs, tgs = [], open(getcwd()+'/corp/wsj10.gold.fix', 'r').readlines()
         for line in tgs:
-            if len(line.split(' @@@ ')[0].split(' ')) <= int(args['--wsjlen']):
+            if len(line.split(' @@@ ')[0].split(' ')) <= int(findall('[0-9]+', struc)[0]):
                 self.gs.append(line)
 
         # output files do not contain spaces, fix for cc.py
@@ -151,7 +151,8 @@ class Tagger:
                         if '--tot' in self.col:
                             D[V1[0][i]][self.col.keys().index('--tot')] += 1
                     else:
-                        if V4[i-int(self.args['--ngr']):i].count(True) is 2 and '--cor' in self.col and self.args['--ngr']:
+                        if V4[i-int(self.args['--ngr']):i].count(True) is 2 \
+                            and '--cor' in self.col and self.args['--ngr']:
                             D[' '.join(V1[0][i-int(self.args['--ngr']):i])][self.col.keys().index('--cor')] += 1
                         elif '--inc' in self.col:
                             D[' '.join(V1[0][i-int(self.args['--ngr']):i])][self.col.keys().index('--inc')] += 1
@@ -205,6 +206,7 @@ class Tagger:
 
     def gen_output(self):
         M, labels, args = self.build_D5(), [], self.args
+        args['--sortk'] = 'tot' if not args['--sortk'] else args['--sortk']
 
         [labels.append(k[2:]) for k in self.col.keys()]; [labels.append('% '+k[2:]) for k in self.col.keys()]
         sortk = self.col.keys().index('--'+args['--sortk']) if not args['--perc'] else \
@@ -215,7 +217,8 @@ class Tagger:
         else:
             labels = labels[:-len(self.col.keys())]
 
-        D5 = OrderedDict(sorted(islice(M.items(), 0, int(args['--top']) if args['--top'] else len(M)), key=lambda (k, v): v[sortk], reverse=True))
+        D5 = OrderedDict(sorted(islice(M.items(), 0, int(args['--top']) if args['--top'] else len(M)),
+                                key=lambda (k, v): v[sortk], reverse=True))
         klist = [tag.replace('$', '\$').replace('[', '$\lbrack$').replace(']', '$\rbrack$') for tag in D5.keys()]
         return D5, klist, labels
 

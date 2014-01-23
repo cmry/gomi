@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 __author__ = 'chris'
+__version__ = '15.01'
 
 from glob import glob
 import subprocess
