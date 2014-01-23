@@ -19,7 +19,7 @@ class Urban:
         for line in data.split():
             if divcount is 2:
                 definition = ""
-                def_raw = def_raw.replace('<div class="example">', '\n\n').replace(' class="definition"', '')
+                def_raw = def_raw.replace('<div class="example">', '\n\n').replace(" class='definition'", '')
                 for character in def_raw:
                     if character is "<":
                         record = False
@@ -32,7 +32,7 @@ class Urban:
                 def_list.append(definition.replace("&#39;", "'").replace("&quot;", '"'))
                 divcount, concat, def_raw = 0, False, ""
 
-            elif line.startswith('class="definition"') or concat:
+            elif line.startswith("class='definition'") or concat:
                 def_raw += (" "+line)
                 concat = True
                 if "</div>" in line:
