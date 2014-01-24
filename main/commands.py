@@ -4,13 +4,14 @@ __file__ = 'commands.py'
 import io
 import random
 from sys import exit
-
+from os import getcwd, path
 from cores.twemo import *
 from cores.wiki import *
 from cores.urban import *
 from cores.aucopro import *
 from cores.nsanews import *
 from cores.trans import *
+from cores.noty import *
 from cores.lang import *
 
 class CmdStrap:
@@ -20,13 +21,14 @@ class CmdStrap:
         if message.find("help") != -1:
             return "Version 1.2.0 - 13.12 \n" \
                    "Code viewable on https://github.com/fazzeh/PyDOS \n" \
-                   "AuCoPro: \t\t\t glados aucopro [word] \n" \
-                   "AuCoPro Check: \t\t glados aucocheck [user] [em##]\n \t\t\t\t\t [base/heid/ster] \n" \
-                   "Wikipedia: \t\t\t glados wiki [query] \n" \
-                   "Urban Dictionary: \t glados urban [query] ([number]) \n" \
-                   "Twitter Emos: \t\t glados twemo [query] \n" \
-                   "NSA News: \t\t\t glados nsa \n" \
-                   "Goslate: \t\t\t glados goslate [lines] \n"
+                   "AuCoPro:            glados aucopro [word] \n" \
+                   "AuCoPro Check:      glados aucocheck [user] [em##]\n" \
+                   "                                     [base/heid/ster] \n" \
+                   "Wikipedia:          glados wiki [query] \n" \
+                   "Urban Dictionary:   glados urban [query] ([number]) \n" \
+                   "Twitter Emos:       glados twemo [query] \n" \
+                   "NSA News:           glados nsa \n" \
+                   "Goslate:            glados goslate [lines] \n"
 
         elif message.find("914D05") != -1:
             exit(0)
@@ -69,18 +71,23 @@ class CmdStrap:
             return self.quote(message, sender)
 
     def quote(self, message, sender):
-        l = Language()
-        q = l.analyse_msg(message, sender)
-        if q:
+        quo = "\n".join(io.open("glados_quotes.txt", "r").readlines()).split("\n\n")
+        for q in quo[random.randint(0, len(quo)-1)].split("\n"):
             return q
-        else:
-            quo = "\n".join(io.open("glados_quotes.txt", "r").readlines()).split("\n\n")
-            for q in quo[random.randint(0, len(quo)-1)].split("\n"):
-                return q
 
     def gen(self, message, sender):
+        namet = [[k, v] for k, v in nd.iteritems() if k in message.lower()]
         if message.find("mogge") != -1:
             return "Hello, test subject "+str(hash(sender))+"."
+        elif namet:
+            noty = Notify(namet, message)
+            noty.send_mail()
+            return
+        else:
+            l = Language()
+            q = l.analyse_msg(message, sender)
+            if q:
+                return q
 
     def get_line(self, command):
         if command == "leave":
