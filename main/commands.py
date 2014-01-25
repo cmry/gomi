@@ -75,7 +75,7 @@ class CmdStrap:
         if message.find("mogge") != -1:
             return "Hello, test subject "+str(hash(sender))+"."
         elif namet:
-            cores.Notify.send_mail(namet, log)
+            cores.Notify.send_mail(namet, message, log)
         else:
             l = cores.Language()
             q = l.analyse_msg(message, sender)
