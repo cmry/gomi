@@ -5,6 +5,7 @@ import io
 import random
 from sys import exit
 from main.conf import *
+from random import randint
 import cores
 
 class CmdStrap:
@@ -16,6 +17,7 @@ class CmdStrap:
         if message.find("help") != -1:
             return "Version 1.2.3 - 14.01 \n" \
                    "Code viewable on https://github.com/fazzeh/PyDOS \n" \
+                   "----------------------------------------------------- \n" \
                    "AuCoPro:            glados aucopro [word] \n" \
                    "AuCoPro Check:      glados aucocheck [user] [em##]\n" \
                    "                                     [base/heid/ster] \n" \
@@ -23,7 +25,8 @@ class CmdStrap:
                    "Urban Dictionary:   glados urban [query] ([number]) \n" \
                    "Twitter Emos:       glados twemo [query] \n" \
                    "NSA News:           glados nsa \n" \
-                   "Goslate:            glados goslate [lines] \n"
+                   "Goslate:            glados goslate [lines] \n" \
+                   "----------------------------------------------------- \n"
 
         elif message.find("914D05") != -1:
             exit(0)
@@ -76,7 +79,7 @@ class CmdStrap:
             return "Hello, test subject "+str(hash(sender))+"."
         elif namet:
             cores.Notify.send_mail(namet, message, log)
-        else:
+        elif randint(0, 5) is 4:
             l = cores.Language()
             q = l.analyse_msg(message, sender)
             if q:

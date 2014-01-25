@@ -10,8 +10,6 @@ class Language:
         pass
 
     def analyse_msg(self, message, sender):
-        #t = Translate()
-        #trans = t.goslate(message, sender)
         return self.jvt_lan(message, sender)
 
     def jvt_lan(self, message, sender):
@@ -60,7 +58,7 @@ class Language:
             for k in jvt:
                 if w in findall(r"[\w]+", k):
                     q = jvt[k].replace('<name>', sender)
-                    if '<sname>' in q and sender is 'Menno' or sender is 'Kobus':
+                    if '<sname>' in q and 'Menno' in sender or 'Kobus' in sender:
                         return
                     else:
                         return q.replace('<sname>', sender)
