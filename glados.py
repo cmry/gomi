@@ -33,9 +33,9 @@ class IRCCat(irclib.SimpleIRCClient):
             message, nick = evt.arguments()[0], evt.source()[0:evt.source().find("!")]
             self.log.feed(message, nick)
             if message.lower().find("glados") != -1:
-                self.talk(cmd.own(message, nick))
+                self.talk(cmd.own(message, nick, self.log))
             else:
-                self.talk(cmd.gen(message, nick)) if cmd.gen(message, nick) else sleep(1)
+                self.talk(cmd.gen(message, nick, self.log)) if cmd.gen(message, nick, self.log) else sleep(1)
             del cmd
         except Exception as e:
             #prevent disconnects due to crappy programming
@@ -46,7 +46,7 @@ class IRCCat(irclib.SimpleIRCClient):
             cmd = CmdStrap()
             message, con, nick = evt.arguments()[0], self.connection, evt.source()[0:evt.source().find("!")]
             if message.lower().find("glados") != -1:
-                self.talk(cmd.own(message, self.log), nick)
+                self.talk(cmd.own(message, nick, self.log), nick)
             del cmd
         except Exception as e:
             print e

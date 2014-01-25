@@ -4,19 +4,15 @@ __file__ = 'commands.py'
 import io
 import random
 from sys import exit
-from os import getcwd, path
-from cores.twemo import *
-from cores.wiki import *
-from cores.urban import *
-from cores.aucopro import *
-from cores.nsanews import *
-from cores.trans import *
-from cores.noty import *
-from cores.lang import *
+from main.conf import *
+import cores
 
 class CmdStrap:
 
-    def own(self, message, sender):
+    def __init__(self):
+        reload(cores)
+
+    def own(self, message, sender, log):
 
         if message.find("help") != -1:
             return "Version 1.2.0 - 13.12 \n" \
@@ -40,51 +36,49 @@ class CmdStrap:
             return self.get_line("leave")
 
         elif message.find("aucopro") != -1:
-            acp = ACP()
+            acp = cores.ACP()
             return acp.aucopro(message)
 
         elif message.find("aucocheck") != -1:
-            acp = ACP()
+            acp = cores.ACP()
             return acp.aucocheck(message)
 
         elif message.find("wiki") != -1:
-            wiki = Wiki()
+            wiki = cores.Wiki()
             return wiki.wiki(message)
 
         elif message.find("twemo") != -1:
-            twemo = Twemo(message, False)
+            twemo = cores.Twemo(message, False)
             return twemo.get_metr()
         
         elif message.find("urban") != -1:
-            urban = Urban()
+            urban = cores.Urban()
             return urban.urban(message)
 
         elif message.find("nsa") != -1:
-            nsa = NSA()
+            nsa = cores.NSA()
             return nsa.grab_daily()
 
         elif message.find("goslate") != -1:
-            trans = Translate()
-            return trans.goslate(message, sender)
+            trans = cores.Translate()
+            return trans.goslate(message, log)
         
         else:
-            return self.quote(message, sender)
+            return self.quote()
 
-    def quote(self, message, sender):
+    def quote(self):
         quo = "\n".join(io.open("glados_quotes.txt", "r").readlines()).split("\n\n")
         for q in quo[random.randint(0, len(quo)-1)].split("\n"):
             return q
 
-    def gen(self, message, sender):
+    def gen(self, message, sender, log):
         namet = [[k, v] for k, v in nd.iteritems() if k in message.lower()]
         if message.find("mogge") != -1:
             return "Hello, test subject "+str(hash(sender))+"."
         elif namet:
-            noty = Notify(namet, message)
-            noty.send_mail()
-            return
+            cores.Notify.send_mail(namet, log)
         else:
-            l = Language()
+            l = cores.Language()
             q = l.analyse_msg(message, sender)
             if q:
                 return q
