@@ -1,8 +1,6 @@
 __author__ = 'chris'
 
-import smtplib
-from email.mime.text import MIMEText
-
+import subprocess
 
 class Notify:
 
@@ -12,12 +10,7 @@ class Notify:
         self.msg = msg
 
     def send_mail(self):
-        e_msg = MIMEText(self.msg)
-
-        e_msg['Subject'] = 'You were mentioned on IRC!'
-        e_msg['From'] = 'info@GLaDOS.uvt.nl'
-        e_msg['To'] = self.mail
-
-        s = smtplib.SMTP('localhost')
-        s.sendmail('info@GLaDOS.uvt.nl', [self.mail], e_msg.as_string())
-        s.quit()
+        p1 = subprocess.Popen(['echo', self.msg], stdout=subprocess.PIPE) 
+        p2 = subprocess.Popen(['mail', '-s' ,"You were mentioned on IRC!", self.mail], stdin=p1.stdout)
+        p1.stdout.close()
+        output = p2.communicate()[0]
