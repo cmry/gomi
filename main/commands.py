@@ -15,17 +15,18 @@ class CmdStrap:
 
     def own(self, message, sender, log):
         if message.find("help") != -1:
-            return "Version 1.2.4 - 14.01 \n" \
+            return "Version 1.2.5 - 14.01 \n" \
                    "Code viewable on https://github.com/fazzeh/PyDOS \n" \
                    "----------------------------------------------------- \n" \
-                   "AuCoPro:            glados aucopro [word] \n" \
-                   "AuCoPro Check:      glados aucocheck [user] [em##]\n" \
+                   "AuCoPro:            aucopro [word] \n" \
+                   "AuCoPro Check:      aucocheck [user] [em##]\n" \
                    "                                     [base/heid/ster] \n" \
-                   "Wikipedia:          glados wiki [query] \n" \
-                   "Urban Dictionary:   glados urban [query] ([number]) \n" \
-                   "Twitter Emos:       glados twemo [query] \n" \
-                   "NSA News:           glados nsa \n" \
-                   "Goslate:            glados goslate [lines] \n" \
+                   "Google              google \n" \
+                   "Wikipedia:          wiki [query] \n" \
+                   "Urban Dictionary:   urban [query] ([number]) \n" \
+                   "Twitter Emos:       twemo [query] \n" \
+                   "NSA News:           nsa \n" \
+                   "Goslate:            goslate [lines] \n" \
                    "----------------------------------------------------- \n"
 
         elif message.find("914D05") != -1:
@@ -64,7 +65,11 @@ class CmdStrap:
         elif message.find("goslate") != -1:
             trans = cores.Translate()
             return trans.goslate(message, log)
-        
+
+        elif message.find("google") != -1:
+            gool = cores.Google()
+            return gool.fetch_search(message)
+
         else:
             return self.quote()
 
