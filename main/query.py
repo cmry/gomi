@@ -9,13 +9,13 @@ class Query:
 
     def search(self, message):
         search = message.split()
-        if len(search) > 3:
-            pos, query = 3, str(search[2])
+        if len(search) > 2:
+            pos, query = 2, str(search[1])
             while pos != len(search):
                 query += " "+search[pos]
                 pos += 1
         else:
-            query = str(search[2])
+            query = str(search[1])
         return query
 
     def cut(self, output):
