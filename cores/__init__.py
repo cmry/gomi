@@ -7,3 +7,4 @@ from cores.nsanews import *
 from cores.trans import *
 from cores.noty import *
 from cores.lang import *
+from cores.gool import *
