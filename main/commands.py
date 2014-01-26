@@ -15,18 +15,18 @@ class CmdStrap:
 
     def own(self, message, sender, log):
         if message.find("help") != -1:
-            return "Version 1.2.5 - 14.01 \n" \
+            return "Version 1.3.1 - 14.01 \n" \
                    "Code viewable on https://github.com/fazzeh/PyDOS \n" \
                    "----------------------------------------------------- \n" \
-                   "AuCoPro:            aucopro [word] \n" \
-                   "AuCoPro Check:      aucocheck [user] [em##]\n" \
+                   "AuCoPro:            :aucopro [word] \n" \
+                   "AuCoPro Check:      :aucocheck [user] [em##]\n" \
                    "                                     [base/heid/ster] \n" \
-                   "Google              google \n" \
-                   "Wikipedia:          wiki [query] \n" \
-                   "Urban Dictionary:   urban [query] ([number]) \n" \
-                   "Twitter Emos:       twemo [query] \n" \
-                   "NSA News:           nsa \n" \
-                   "Goslate:            goslate [lines] \n" \
+                   "Google              :google \n" \
+                   "Wikipedia:          :wiki [query] \n" \
+                   "Urban Dictionary:   :urban [query] ([number]) \n" \
+                   "Twitter Emos:       :twemo [query] \n" \
+                   "NSA News:           :nsa \n" \
+                   "Goslate:            :goslate [lines] \n" \
                    "----------------------------------------------------- \n"
 
         elif message.find("914D05") != -1:

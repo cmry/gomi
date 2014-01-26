@@ -12,7 +12,7 @@ class Google:
 
     def fetch_search(self, message):
         query = self.q.search(message).split(' ')
-        amt = query.pop(len(query)-1) if isinstance(query[len(query)-1], int) else len(query)-1
+        amt = query.pop(len(query)-1) if isinstance(query[len(query)-1], int) else len(query)
         data = self.ajax(query)
 
         hits = data['results']
