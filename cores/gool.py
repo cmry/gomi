@@ -12,9 +12,14 @@ class Google:
 
     def fetch_search(self, message):
         query = self.q.search(message).split(' ')
-        amt = query.pop(len(query)-1) if isinstance(query[len(query)-1], int) else len(query)
+        
+        try:
+            amt = int(query.pop(len(query)-1))
+            amt = 4 if amt > 4 else amt
+        except TypeError:
+            amt = len(query)
+        
         data = self.ajax(query)
-
         hits = data['results']
         tot = 'Total results: %s' % data['cursor']['estimatedResultCount']
         top = 'Top %d hits:' % amt
