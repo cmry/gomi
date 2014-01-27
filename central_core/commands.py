@@ -2,16 +2,11 @@ __author__ = 'chris'
 __file__ = 'commands.py'
 
 import io
-import random
 from sys import exit
-from main.conf import *
 from random import randint
 import cores
 
 class CmdStrap:
-
-    def __init__(self):
-        reload(cores)
 
     def own(self, message, sender, log):
         if message.find("help") != -1:
@@ -53,7 +48,7 @@ class CmdStrap:
         elif message.find("twemo") != -1:
             twemo = cores.Twemo(message, False)
             return twemo.get_metr()
-        
+
         elif message.find("urban") != -1:
             urban = cores.Urban()
             return urban.urban(message)
@@ -75,11 +70,11 @@ class CmdStrap:
 
     def quote(self):
         quo = "\n".join(io.open("glados_quotes.txt", "r").readlines()).split("\n\n")
-        for q in quo[random.randint(0, len(quo)-1)].split("\n"):
+        for q in quo[randint(0, len(quo)-1)].split("\n"):
             return q
 
     def gen(self, message, sender, log):
-        namet = [[k, v] for k, v in nd.iteritems() if k in message.lower()]
+        namet = [[k, v] for k, v in cores.nd.iteritems() if k in message.lower()]
         if message.find("mogge") != -1:
             return "Hello, test subject "+str(hash(sender))+"."
         elif namet:

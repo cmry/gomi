@@ -2,7 +2,7 @@ __author__ = 'chris'
 __file__ = 'trans.py'
 
 import goslate
-from main.query import *
+from central_core.query import *
 
 class Translate:
 
