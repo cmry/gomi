@@ -33,7 +33,11 @@ class IRCCat(irclib.SimpleIRCClient):
             message, nick = evt.arguments()[0], evt.source()[0:evt.source().find("!")]
             self.log.feed(message, nick)
             if message.lower().startswith(":"):
-                self.talk(cmd.own(message, nick, self.log))
+                core_out = cmd.own(message, nick, self.log)
+                if core_out:
+                    self.talk(core_out)
+            elif message.lower().find('glados') != -1:
+                self.talk(cmd.quote())
             else:
                 self.talk(cmd.gen(message, nick, self.log)) if cmd.gen(message, nick, self.log) else sleep(1)
             del cmd

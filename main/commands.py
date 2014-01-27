@@ -21,7 +21,7 @@ class CmdStrap:
                    "AuCoPro:            :aucopro [word] \n" \
                    "AuCoPro Check:      :aucocheck [user] [em##]\n" \
                    "                                     [base/heid/ster] \n" \
-                   "Google              :google \n" \
+                   "Google              :google [query] ([top-n]) \n" \
                    "Wikipedia:          :wiki [query] \n" \
                    "Urban Dictionary:   :urban [query] ([number]) \n" \
                    "Twitter Emos:       :twemo [query] \n" \
@@ -71,7 +71,7 @@ class CmdStrap:
             return gool.fetch_search(message)
 
         else:
-            return self.quote()
+            pass
 
     def quote(self):
         quo = "\n".join(io.open("glados_quotes.txt", "r").readlines()).split("\n\n")
