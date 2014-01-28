@@ -1,16 +1,18 @@
 __author__ = 'chris'
 __file__ = 'commands.py'
 
-import io
-from sys import exit
-from random import randint
-import cores
+import io, sys, random, cores
+from central_core.conf import *
 
-class CmdStrap:
+
+class CoreStrap:
+
+    def __init__(self):
+        pass
 
     def own(self, message, sender, log):
         if message.find("help") != -1:
-            return "Version 1.3.1 - 14.01 \n" \
+            return "Version 1.4.0 - 14.01 \n" \
                    "Code viewable on https://github.com/fazzeh/PyDOS \n" \
                    "----------------------------------------------------- \n" \
                    "AuCoPro:            :aucopro [word] \n" \
@@ -25,7 +27,7 @@ class CmdStrap:
                    "----------------------------------------------------- \n"
 
         elif message.find("914D05") != -1:
-            exit(0)
+            sys.exit(0)
 
         elif message.find("cube") != -1:
             return self.get_line("cube")
@@ -34,35 +36,43 @@ class CmdStrap:
             return self.get_line("leave")
 
         elif message.find("aucopro") != -1:
-            acp = cores.ACP()
+            reload(cores.aucopro)
+            acp = cores.aucopro.ACP()
             return acp.aucopro(message)
 
         elif message.find("aucocheck") != -1:
-            acp = cores.ACP()
+            reload(cores.aucopro)
+            acp = cores.aucopro.ACP()
             return acp.aucocheck(message)
 
         elif message.find("wiki") != -1:
-            wiki = cores.Wiki()
+            reload(cores.wiki)
+            wiki = cores.wiki.Wiki()
             return wiki.wiki(message)
 
         elif message.find("twemo") != -1:
-            twemo = cores.Twemo(message, False)
+            reload(cores.twemo)
+            twemo = cores.twemo.Twemo(message, False)
             return twemo.get_metr()
 
         elif message.find("urban") != -1:
-            urban = cores.Urban()
+            reload(cores.urban)
+            urban = cores.urban.Urban()
             return urban.urban(message)
 
         elif message.find("nsa") != -1:
-            nsa = cores.NSA()
+            reload(cores.nsanews)
+            nsa = cores.nsanews.NSA()
             return nsa.grab_daily()
 
         elif message.find("goslate") != -1:
-            trans = cores.Translate()
+            reload(cores.trans)
+            trans = cores.trans.Translate()
             return trans.goslate(message, log)
 
         elif message.find("google") != -1:
-            gool = cores.Google()
+            reload(cores.gool)
+            gool = cores.gool.Google()
             return gool.fetch_search(message)
 
         else:
@@ -70,17 +80,18 @@ class CmdStrap:
 
     def quote(self):
         quo = "\n".join(io.open("glados_quotes.txt", "r").readlines()).split("\n\n")
-        for q in quo[randint(0, len(quo)-1)].split("\n"):
+        for q in quo[random.randint(0, len(quo)-1)].split("\n"):
             return q
 
     def gen(self, message, sender, log):
-        namet = [[k, v] for k, v in cores.nd.iteritems() if k in message.lower()]
+
+        namet = [[k, v] for k, v in nd.iteritems() if k in message.lower()]
         if message.find("mogge") != -1:
             return "Hello, test subject "+str(hash(sender))+"."
         elif namet:
-            cores.Notify.send_mail(namet, message, log)
-        elif randint(0, 5) is 4:
-            l = cores.Language()
+            cores.noty.Notify.send_mail(namet, message, log)
+        elif random.randint(0, 5) is 4:
+            l = cores.lang.Language()
             q = l.analyse_msg(message, sender)
             if q:
                 return q

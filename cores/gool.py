@@ -12,14 +12,14 @@ class Google:
 
     def fetch_search(self, message):
         query = self.q.search(message).split(' ')
-        
+
         try:
             int(query[len(query)-1])
             amt = int(query.pop(len(query)-1))
             amt = 4 if amt > 4 else amt
         except (TypeError, ValueError):
             amt = 1
-        
+
         data, outp = self.ajax(query), ''
         for x in range(0, amt):
             h = data['results'][x]

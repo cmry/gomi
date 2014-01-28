@@ -16,7 +16,7 @@ class IRCCat(irclib.SimpleIRCClient):
         irclib.SimpleIRCClient.__init__(self)
         self.tag = chl
         self.log = Log()
-        self.cmd = CmdStrap()
+        self.cmd = CoreStrap()
 
     def on_welcome(self, con, evt):
         """ Used for joining, can't be simplified or talk function will break. """
