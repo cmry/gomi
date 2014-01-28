@@ -4,8 +4,8 @@ __file__ = 'aucopro.py'
 import re
 import pysftp
 from urllib2 import urlopen
-from main.query import *
-from main.conf import *
+from central_core.query import *
+from central_core.conf import *
 
 
 class ACP:

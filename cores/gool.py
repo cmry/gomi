@@ -1,7 +1,7 @@
 #!/usr/bin/python
 __author__ = 'chris'
 
-from main.query import *
+from central_core.query import *
 import json
 import urllib
 
@@ -12,18 +12,18 @@ class Google:
 
     def fetch_search(self, message):
         query = self.q.search(message).split(' ')
-        amt = query.pop(len(query)-1) if isinstance(query[len(query)-1], int) else len(query)
-        data = self.ajax(query)
 
-        hits = data['results']
-        tot = 'Total results: %s' % data['cursor']['estimatedResultCount']
-        top = 'Top %d hits:' % amt
+        try:
+            int(query[len(query)-1])
+            amt = int(query.pop(len(query)-1))
+            amt = 4 if amt > 4 else amt
+        except (TypeError, ValueError):
+            amt = 1
 
-        outp = top + '                    ' + tot + '\n'
+        data, outp = self.ajax(query), ''
         for x in range(0, amt):
             h = data['results'][x]
-            outp += h['title'].replace('<b>', '*').replace('</b>', '*') + ' -- ' + \
-                    h['content'].replace('<b>', '*').replace('</b>', '*').replace('\n', '') + '\n' + \
+            outp += h['content'].replace('<b>', '*').replace('</b>', '*').replace('\n', '') + '\n' + \
                     '  ' + h['url'] + '\n'
         return outp.encode('utf8')
 
