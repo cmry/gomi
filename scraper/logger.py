@@ -13,7 +13,7 @@ class Logger:
         logging.basicConfig(level=logging.DEBUG,
                             format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
                             datefmt='%m-%d %H:%M',
-                            filename='log/'+str(hash(self))+'.log',
+                            filename='../log/'+str(hash(self))+'.log',
                             filemode='w')
 
         console = logging.StreamHandler()

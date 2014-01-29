@@ -3,7 +3,7 @@ __author__ = 'chris'
 import socket
 from urllib2 import *
 from random import shuffle
-from logger import Logger
+from scraper.logger import Logger
 
 
 class Spider:

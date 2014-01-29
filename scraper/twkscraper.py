@@ -3,8 +3,10 @@
 
 __author__ = 'chris'
 
-from article import *
 from re import compile
+
+from scraper.article import *
+
 
 class TwkScraper:
 

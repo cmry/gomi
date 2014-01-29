@@ -4,11 +4,13 @@
 __author__ = 'chris'
 
 import socket
-from article import *
 from urllib2 import *
-from bs4 import BeautifulSoup
 from re import compile
 from time import sleep, strptime
+
+from bs4 import BeautifulSoup
+
+from scraper.article import *
 
 
 class NuScraper:

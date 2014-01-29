@@ -5,12 +5,14 @@ __author__ = 'chris'
 
 import socket
 from urllib2 import *
-from bs4 import BeautifulSoup
 from random import shuffle
 from time import sleep
 from random import randint
 from os import path, chdir, listdir
-from twkscraper import TwkScraper
+
+from bs4 import BeautifulSoup
+
+from scraper.twkscraper import TwkScraper
 from nuscraper import NuScraper
 from logger import Logger
 
@@ -113,20 +115,20 @@ class Scraper:
     def gen_id(self, site, nr):
         """ Generates a hash based on url + article number (re-usable). """
         site.art.id = hash(site.target+str(nr))
-        if path.isfile("res/"+str(site.art.id)+".txt"):
+        if path.isfile("../res/"+str(site.art.id)+".txt"):
             self.log.rlog.info(str(site.art.id)+" already in log.")
             return True
 
-        if 'nu.nl' in site.target:
-            chdir(os.getcwd()+"/log")
+        if 'nu.nl' in site.target: #TODO: fix dit
+            chdir(os.getcwd()+"/../log")
             for files in listdir("."):
                 if files.endswith(".log"):
                     with open(files, 'r') as fl:
                         if str(nr) in fl.read():
-                            chdir("..")
+                            chdir("../scraper/")
                             self.log.rlog.info(str(site.art.id)+" already in log.")
                             return True
-            chdir("..")
+            chdir("../scraper/")
 
     def fetch_target(self, site):
         """ Used to abbreviate our target (re-usable). """

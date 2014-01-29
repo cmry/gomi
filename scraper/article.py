@@ -86,7 +86,7 @@ class Article:
         self.article['subjects'] = self.subj
         self.article['content'] = self.content
         self.article['comments'] = self.comments
-        with open('res/'+str(self.article['id'])+'.txt', 'w') as f:
+        with open('../res/'+str(self.article['id'])+'.txt', 'w') as f:
             f.write(json.dumps(self.article,
                                sort_keys=False,
                                indent=4,
