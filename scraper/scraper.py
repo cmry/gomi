@@ -14,7 +14,7 @@ from bs4 import BeautifulSoup
 
 from scraper.twkscraper import TwkScraper
 from nuscraper import NuScraper
-from logger import Logger
+from core.logger import Logger
 
 
 class Scraper:
@@ -119,7 +119,7 @@ class Scraper:
             self.log.rlog.info(str(site.art.id)+" already in log.")
             return True
 
-        if 'nu.nl' in site.target: #TODO: fix dit
+        if 'nu.nl' in site.target:
             chdir(os.getcwd()+"/../log")
             for files in listdir("."):
                 if files.endswith(".log"):
