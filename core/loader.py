@@ -31,12 +31,14 @@ class Loader:
                         pass
         return data
 
+    def data_wrapper(self, args):
+        pass
+
     def data_size(self):
         return len(self.data)
 
-    def empty_docs(self):
-        count = 0
-        for x in range(0, len(self.data)):
-            if self.data[x]['comments']:
-                count += 1
-        return len(self.data) - count
+    def sample(self):
+        return json.dumps(self.data[0], sort_keys=False, indent=4, separators=(',', ': '))
+
+    def empty_docs(self, x):
+        yield self.data[x]['comments']

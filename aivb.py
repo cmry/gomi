@@ -5,8 +5,8 @@ __version__ = 'Version 30.01'  # update by date on subclass change
 __doc__ = """ AIVB
 
  Usage:
-    aivb -v eval load [--test=N]
-    aivb -v eval data [-l] [-e]
+    aivb eval load [--test=N]
+    aivb eval data [-l] [-s] [--loop] [-e]
     aivb (-h | --help)
     aivb --version
     aivb (-q | --quit)
@@ -18,12 +18,14 @@ __doc__ = """ AIVB
     data                this executes commands that are directly based on the data
 
  Load:
+    --loop              wrap actions that need a loop to process (-e)
     --test=N            specify the amount of articles you want to use for a test
                         set to soften memory load on dev
 
  Data:
     -l                  get the length of the total dataset
     -e                  get the amount of missing comments
+    -s                  print sample of the output
 
  Misc:
     -h, --help          show this help message and exit
@@ -53,17 +55,21 @@ class Wrapper:
         self.log = core.logger.Logger()
 
     def route(self, args):
-        outp = {}
+        outp = {}; reload(core)
         if args['eval']:
             if args['load'] and not self.obj:
                 self.obj = core.loader.Loader(args['--test'])
                 self.log.elog.info("Database was loaded!")
             else:
                 try:
-                    if args['-l']:
-                        outp.update({'Data size:': self.obj.data_size()})
-                    if args['-e']:
-                        outp.update({'Empty data:': self.obj.empty_docs()})
+                    if args['--loop']:
+                        dic = self.obj.data_wrapper(args)
+                        outp.update(dic)
+                    else:
+                        if args['-l']:
+                            outp.update({'Data size:': self.obj.data_size()})
+                        if args['-s']:
+                            outp.update({'Data sample:': self.obj.sample()})
                 except NameError:
                     self.log.elog.info("Please load the database first.")
 
@@ -75,22 +81,21 @@ class Wrapper:
 
 def main(store):
     inp = raw_input('>> ').split()
-    if inp != 'aivb -q':
+    if inp != '-q':
         try:
-            args = docopt(__doc__, argv=inp[1:], version=__version__)
-            if not args['--verbose']:
-                sys.stdout = open(os.getcwd()+'/log/log.log', 'w')
+            args = docopt(__doc__, argv=inp, version=__version__)
+            #if not args['--verbose']:
+            #    sys.stdout = open(os.getcwd()+'/log/log.log', 'w')
             if not store:
                 store = Wrapper()
             store.route(args)
             return store
         except (Exception, SystemExit) as e:
-            print e
+            print "Error: "+str(e)
     else:
         raise SystemExit
 
 if __name__ == '__main__':
-    store = None; print "Starting AIVB - type: 'aivb -q' to quit & 'aivb -h' for help"
+    store = None; print "Starting AIVB - type: '-q' to quit & '-h' for help"
     while True:
-        reload(core)
         store = main(store)
