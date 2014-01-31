@@ -7,7 +7,7 @@ __doc__ = """ FTUK!
  Usage:
     ftuk [-v] freq [-cit] <input>... [--sortk=key] [--top=N] [--perc] [--tex] [--ngr=N] [--amb]
     ftuk [-v] fix <input>
-    ftuk [-v] map <input>...
+    ftuk [-v] map <input>... [--all]
     ftuk (-h | --help)
     ftuk --version
 
@@ -30,6 +30,9 @@ __doc__ = """ FTUK!
     --tex               output in TeX to outp folder, default is print
     --ngr=N             get the N-gram frequencies of each tag (e.g. N=2)
     --amb               allow ambiguous words to be incorporated in analysis
+
+ Map:
+    --all               include incorrectly learned tags [INC] in the ouput
 
  Misc:
     -h, --help              show this help message and exit
