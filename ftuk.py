@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
 __author__ = 'chris'
-__version__ = 'Version 23.01'  # update by date on subclass change
+__version__ = 'Version 30.01'  # update by date on subclass change
 __doc__ = """ FTUK!
 
  Usage:
     ftuk [-v] freq [-cit] <input>... [--sortk=key] [--top=N] [--perc] [--tex] [--ngr=N] [--amb]
     ftuk [-v] fix <input>
+    ftuk [-v] map <input>...
     ftuk (-h | --help)
     ftuk --version
 
@@ -15,6 +16,9 @@ __doc__ = """ FTUK!
                         corpora to terminal or the oupt/res.tex file
     fix                 recompiles the old WSJ corpus to a format usable
                         by ABL, old function, better not use
+    map                 create a mapping of the POS tags per likely POS
+                        candidate, inherits a lot of code from freq but
+                        splitted for better overview
  Freq:
     -c, --cor               list the column with correctly learned tags
     -i, --inc               list the column with incorrectly learned tags
@@ -39,6 +43,7 @@ from docopt import docopt  # install with pip
 from os import getcwd
 from mods import tagger
 from mods import cc
+from mods import map
 
 
 class Ftuk():
@@ -55,6 +60,8 @@ class Ftuk():
             tagger.main(args)
         elif args['fix']:
             cc.main()
+        elif args['map']:
+            map.main(args)
         exit(" ------- Finished -------")
 
 

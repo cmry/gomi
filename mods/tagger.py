@@ -17,6 +17,8 @@ class Tagger:
             and given results (struc) files and wsj length, and calculates
             the scores for correctly learned POS tags. """
 
+        # TODO: refactor class to only loop through both files once, low priority
+
         self.args = args
         self.col = self.get_col()
         self.logd = {}
@@ -73,10 +75,13 @@ class Tagger:
         for line in fl:
             parts = line.split(' @@@ ')
             parts[0] = parts[0].replace(', ', ',')  # correct fuckup in cc.py
-            if clean:
+            if clean == 'clean':
                 # remove POS tags and space between 'tuples' for D2 and D3
                 parts[1] = sub(', \[[A-Z0-9, ]*.\]', '', parts[1])
                 parts[1] = sub(', ', ',', parts[1])
+            elif clean == 'struc':
+                parts[1] = sub('\([0-9]+, [0-9]+, ', '', parts[1])
+                parts[1] = sub('\)', '', parts[1])
             else:
                 # only keep the POS tags for D1
                 parts[1] = sub('[(0-9),]', '', parts[1])
