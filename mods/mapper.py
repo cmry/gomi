@@ -5,10 +5,16 @@ __version__ = 'Version 30.01'
 
 from os import getcwd
 from mods import tagger
-from re import sub, match
+from collections import OrderedDict
+from itertools import islice
+from pandas import DataFrame
 
 
 class Mapper(tagger.Tagger):
+
+    def frame_map(self, data):
+        """ This is just a small wrapper for pandas DataFrame. """
+        return DataFrame.from_dict(data)
 
     def inf_D(self):
         """ This function pretty much resembles the D4 function from the
@@ -82,6 +88,24 @@ class Mapper(tagger.Tagger):
 
         return D
 
+    def gen_map_output(self):
+        D, labels, args = self.mapping(), [], self.args
+        args['--sortk'] = 'tot' if not args['--sortk'] else args['--sortk']
+
+        for key, value in D.iteritems():
+            D[key] = sorted(value.items(), key=lambda (k, v): v, reverse=True)
+        D5 = OrderedDict(sorted(D.items(), key=lambda (k, v): v[0][1], reverse=True))
+
+        count = 0
+        for key, value in D5.iteritems():
+            print key, value
+            if count is 10:
+                break
+            else:
+                count += 1
+
+        # TODO: dataframe dict of dicts with uneven length, good luck
+
 def main(args):
 
     # create frequency and percentage lists, edit v[0] to sort on other value >> output to latex
@@ -89,16 +113,7 @@ def main(args):
 
     for corp in corp_list:
         mapper = Mapper(getcwd()+'/corp/'+corp, args)
-        D, klist, labels = mapper.gen_output(mapper.mapping())
-
-        if args['--tex']:
-            with open(getcwd()+'/outp/res.tex', 'w') as fl:
-                fl.write("% "+corp+" ------------------------------------------------------------------------ \n")
-                mapper.frame_ord(D.values(), klist, labels).to_latex(fl)
-                fl.write("\n")
-        else:
-            print mapper.frame_ord(D.values(), klist, labels).values
-        mapper.logger(mapper.logd)
+        mapper.gen_map_output()
 
 if __name__ == '__main__':
     main(open(getcwd()+'/outp/log.log', 'w'))

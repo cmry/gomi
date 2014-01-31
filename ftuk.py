@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+d#!/usr/bin/env python
 
 __author__ = 'chris'
 __version__ = 'Version 30.01'  # update by date on subclass change
@@ -7,7 +7,7 @@ __doc__ = """ FTUK!
  Usage:
     ftuk [-v] freq [-cit] <input>... [--sortk=key] [--top=N] [--perc] [--tex] [--ngr=N] [--amb]
     ftuk [-v] fix <input>
-    ftuk [-v] map <input>... [--all]
+    ftuk [-v] map [-cit] <input>... [--sortk=key] [--top=N] [--perc] [--tex] [--ngr=N] [--amb] [--all]
     ftuk (-h | --help)
     ftuk --version
 
@@ -46,7 +46,7 @@ from docopt import docopt  # install with pip
 from os import getcwd
 from mods import tagger
 from mods import cc
-from mods import map
+from mods import mapper
 
 
 class Ftuk():
@@ -64,7 +64,7 @@ class Ftuk():
         elif args['fix']:
             cc.main()
         elif args['map']:
-            map.main(args)
+            mapper.main(args)
         exit(" ------- Finished -------")
 
 
