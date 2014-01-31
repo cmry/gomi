@@ -104,7 +104,7 @@ class Mapper(tagger.Tagger):
             else:
                 count += 1
 
-        # TODO: dataframe dict of dicts with uneven length, good luck
+        # TODO: dataframe dict of dicts with uneven length, good luck, etc
 
 def main(args):
 

@@ -49,7 +49,7 @@ from mods import cc
 from mods import mapper
 
 
-class Ftuk():
+class Ftuk:
 
     def __init__(self, args):
         """ This is the main wrapper class to carry out functions
