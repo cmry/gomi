@@ -124,17 +124,12 @@ class Mapper(tagger.Tagger):
             D5 = self.map_perc(D)
 
         for key, value in D.iteritems():
-<<<<<<< HEAD
             D[key] = sorted(value.items(),
                             key=lambda (k, v): v, reverse=True)  # removing will break the func below
             D[key] = sorted(islice(D[key], int(args['--ttop']) if args['--ttop'] else len(D[key])),
                             key=lambda (k, v): v, reverse=True)
         D5 = OrderedDict(sorted(D.items(),
                             key=lambda (k, v): v[0][1], reverse=True))
-=======
-            D[key] = sorted(islice(D[key], int(args['--ttop']) if args['--ttop'] else len(D[key])), key=lambda (k, v): v, reverse=True)
-        D5 = OrderedDict(sorted(D.items(), key=lambda (k, v): v[0][1], reverse=True))
->>>>>>> 542d8b765f994784da0f951ce0614e1627533f6a
         if args['--top']:
             D5 = OrderedDict(islice(D5.iteritems(), int(args['--top'])))
 
