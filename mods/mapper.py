@@ -15,7 +15,7 @@ class Mapper(tagger.Tagger):
 
     def frame_map(self, data):
         """ This is just a small wrapper for pandas DataFrame. """
-        return DataFrame.from_dict(data, orient='index')
+        return DataFrame.from_dict(data, orient='columns')
 
     def inf_D(self):
         """ This function pretty much resembles the D4 function from the
@@ -38,7 +38,8 @@ class Mapper(tagger.Tagger):
                     tup = V2[0][i]
                     try:
                         if tup in D3[K2][0]:
-                            D[K2].append([tup, True, D_gs[K2][0][i], D_st[K2][0][D3[K2][0].index(tup)]]); tlist.append(True)
+                            D[K2].append([tup, True, D_gs[K2][0][i], D_st[K2][0][D3[K2][0].index(tup)]])
+                            tlist.append(True)
                         else:
                             D[K2].append([tup, False, D_gs[K2][0][i], '[INC]']); flist.append(False)
                     except KeyError as e:   # some lines seem to be altered in wsj10.wb
@@ -100,11 +101,12 @@ class Mapper(tagger.Tagger):
         args['--sortk'] = 'tot' if not args['--sortk'] else args['--sortk']
 
         for key, value in D.iteritems():
-            Dx = OrderedDict(sorted(value.items(), key=lambda (k, v): v, reverse=True))
-            D[key] = sorted(islice(Dx.items(), 0, int(args['--top']) if args['--top'] else len(Dx)))
+            D[key] = sorted(islice(D[key], int(args['--ttop']) if args['--ttop'] else len(D[key])), key=lambda (k, v): v, reverse=True)
         D5 = OrderedDict(sorted(D.items(), key=lambda (k, v): v[0][1], reverse=True))
-        D5 = OrderedDict(sorted(islice(D5.items(), 0, int(args['--top']) if args['--top'] else len(D5)),
-                                key=lambda (k, v): v[0][1], reverse=True))  # ugly implementation but needed for slice
+        if args['--top']:
+            D5 = OrderedDict(islice(D5.iteritems(), int(args['--top'])))
+
+
         return D5
 
 def main(args):
