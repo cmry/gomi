@@ -96,13 +96,40 @@ class Mapper(tagger.Tagger):
 
         return D
 
+    def map_perc(self, D):
+        #get the totals for each tag & for each key
+        tot_dict, key_dict = self.get_D2(), {}
+        for key, value in D.iteritems():
+            key_dict[key] = 0
+            for tag, count in value.iteritems():
+                tot_dict[tag] += count
+                key_dict[key] += count
+
+
+        print tot_dict
+        for key, value in D.iteritems():
+            for tag, count in value.iteritems():
+                try:
+                    # TODO: still want to weight the percentages based on total
+                    D[key][tag] = round(float(count)/(float(tot_dict[tag])), 4)
+                    #D[key][tag] = round(float(count)/float(key_dict[key]), 4)
+                except ZeroDivisionError:
+                    D[key][tag] = 0.0
+
+        return D
+
     def gen_map_output(self):
-        D, labels, args = self.mapping(), [], self.args
-        args['--sortk'] = 'tot' if not args['--sortk'] else args['--sortk']
+        D, args = self.mapping(), self.args
+        if args['--perc']:
+            D5 = self.map_perc(D)
 
         for key, value in D.iteritems():
-            D[key] = sorted(islice(D[key], int(args['--ttop']) if args['--ttop'] else len(D[key])), key=lambda (k, v): v, reverse=True)
-        D5 = OrderedDict(sorted(D.items(), key=lambda (k, v): v[0][1], reverse=True))
+            D[key] = sorted(value.items(),
+                            key=lambda (k, v): v, reverse=True)  # removing will break the func below
+            D[key] = sorted(islice(D[key], int(args['--ttop']) if args['--ttop'] else len(D[key])),
+                            key=lambda (k, v): v, reverse=True)
+        D5 = OrderedDict(sorted(D.items(),
+                            key=lambda (k, v): v[0][1], reverse=True))
         if args['--top']:
             D5 = OrderedDict(islice(D5.iteritems(), int(args['--top'])))
 

@@ -7,7 +7,7 @@ __doc__ = """ FTUK!
  Usage:
     ftuk [-v] freq [-cit] <input>... [--sortk=key] [--top=N] [--perc] [--tex] [--ngr=N] [--amb]
     ftuk [-v] fix <input>
-    ftuk [-v] map [-cit] <input>... [--sortk=key] [--top=N] [--ttop=N] [--perc] [--tex] [--ngr=N] [--amb] [--all]
+    ftuk [-v] map [-cit] <input>... [--top=N] [--ttop=N] [--perc] [--tex] [--all]
     ftuk (-h | --help)
     ftuk --version
 
