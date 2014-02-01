@@ -1,4 +1,4 @@
-d#!/usr/bin/env python
+#!/usr/bin/env python
 
 __author__ = 'chris'
 __version__ = 'Version 30.01'  # update by date on subclass change
@@ -7,7 +7,7 @@ __doc__ = """ FTUK!
  Usage:
     ftuk [-v] freq [-cit] <input>... [--sortk=key] [--top=N] [--perc] [--tex] [--ngr=N] [--amb]
     ftuk [-v] fix <input>
-    ftuk [-v] map [-cit] <input>... [--sortk=key] [--top=N] [--perc] [--tex] [--ngr=N] [--amb] [--all]
+    ftuk [-v] map [-cit] <input>... [--sortk=key] [--top=N] [--ttop=N] [--perc] [--tex] [--ngr=N] [--amb] [--all]
     ftuk (-h | --help)
     ftuk --version
 
@@ -33,6 +33,7 @@ __doc__ = """ FTUK!
 
  Map:
     --all               include incorrectly learned tags [INC] in the ouput
+    --ttop=N            output only the top N tags
 
  Misc:
     -h, --help              show this help message and exit

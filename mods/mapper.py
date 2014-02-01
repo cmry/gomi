@@ -8,13 +8,14 @@ from mods import tagger
 from collections import OrderedDict
 from itertools import islice
 from pandas import DataFrame
+from re import findall
 
 
 class Mapper(tagger.Tagger):
 
     def frame_map(self, data):
         """ This is just a small wrapper for pandas DataFrame. """
-        return DataFrame.from_dict(data)
+        return DataFrame.from_dict(data, orient='index')
 
     def inf_D(self):
         """ This function pretty much resembles the D4 function from the
@@ -53,15 +54,21 @@ class Mapper(tagger.Tagger):
                           "Mapper Tuple Err: ": len(verrs)})
         return D
 
-    def plus_tag(self, D, tag):
+    def plus_tag(self, D, D2, tag):
         if tag[3] not in D:
             D[tag[3]] = {}
         if tag[2] not in D[tag[3]]:
-            D[tag[3]][tag[2]] = 0
+            D[tag[3]] = dict(D2)
             D[tag[3]][tag[2]] += 1
         else:
             D[tag[3]][tag[2]] += 1
         return D
+
+    def get_D2(self):
+        D2 = {}
+        for tag in set(findall('\[[A-Z\$:=]+]', str(self.gs))):
+            if tag not in D2: D2[tag] = 0  # errors in outer scope
+        return D2
 
     def mapping(self):
         """ For the mapping, we loop through the given output file and
@@ -70,7 +77,7 @@ class Mapper(tagger.Tagger):
          same key sentence. So we will get something like:
          {'[0]': {'S': n, 'NP': n, etc.}. '[1]': {idem}} """
 
-        D, inf_D = {}, self.inf_D()
+        D, D2, inf_D = {}, self.get_D2(), self.inf_D()
         errs = []
 
         for key, value in inf_D.iteritems():
@@ -78,10 +85,10 @@ class Mapper(tagger.Tagger):
                 for tag in value:
                     if self.args['--all']:
                         if tag[1]:
-                            D = self.plus_tag(D, tag)
+                            D = self.plus_tag(D, D2, tag)
                     else:
-                        D = self.plus_tag(D, tag)
-            except IndexError as e:
+                        D = self.plus_tag(D, D2, tag)
+            except (IndexError, KeyError) as e:
                 errs.append(e)
 
         self.logd.update({"Mapper Wrong List: ": len(errs)})
@@ -93,18 +100,12 @@ class Mapper(tagger.Tagger):
         args['--sortk'] = 'tot' if not args['--sortk'] else args['--sortk']
 
         for key, value in D.iteritems():
-            D[key] = sorted(value.items(), key=lambda (k, v): v, reverse=True)
+            Dx = OrderedDict(sorted(value.items(), key=lambda (k, v): v, reverse=True))
+            D[key] = sorted(islice(Dx.items(), 0, int(args['--top']) if args['--top'] else len(Dx)))
         D5 = OrderedDict(sorted(D.items(), key=lambda (k, v): v[0][1], reverse=True))
-
-        count = 0
-        for key, value in D5.iteritems():
-            print key, value
-            if count is 10:
-                break
-            else:
-                count += 1
-
-        # TODO: dataframe dict of dicts with uneven length, good luck, etc
+        D5 = OrderedDict(sorted(islice(D5.items(), 0, int(args['--top']) if args['--top'] else len(D5)),
+                                key=lambda (k, v): v[0][1], reverse=True))  # ugly implementation but needed for slice
+        return D5
 
 def main(args):
 
@@ -113,7 +114,16 @@ def main(args):
 
     for corp in corp_list:
         mapper = Mapper(getcwd()+'/corp/'+corp, args)
-        mapper.gen_map_output()
+
+        if args['--tex']:
+            with open(getcwd()+'/outp/res.tex', 'w') as fl:
+                fl.write("% "+corp+" ------------------------------------------------------------------------ \n")
+                print "Writing tex, this might take a shitload of time, grab a coffee!"
+                mapper.frame_map(mapper.gen_map_output()).to_latex(fl)
+                fl.write("\n")
+        else:
+            print mapper.frame_map(mapper.gen_map_output()).values
+        mapper.logger(mapper.logd)
 
 if __name__ == '__main__':
     main(open(getcwd()+'/outp/log.log', 'w'))
