@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 
 __author__ = 'chris'
-__version__ = 'Version 30.01'  # update by date on subclass change
+__version__ = 'Version 03.02'  # update by date on subclass change
 __doc__ = """ AIVB
 
  Usage:
-    aivb eval load [--test=N]
-    aivb eval data [-l] [-s] [--loop] [-e]
+    aivb load [--test=N]
+    aivb data [-l] [-s] [--loop] [-e]
     aivb (-h | --help)
-    aivb --version
     aivb (-q | --quit)
+    aivb --version
 
  Arguments:
     eval                this is the evaluation module for the scraped articles
@@ -55,24 +55,30 @@ class Wrapper:
         self.log = core.logger.Logger()
 
     def route(self, args):
+        """ The route functions handles the arguments and pipes them to
+        the appropriate functions. """
         outp = {}; reload(core)
-        if args['eval']:
-            if args['load'] and not self.obj:
-                self.obj = core.loader.Loader(args['--test'])
-                self.log.elog.info("Database was loaded!")
-            else:
-                try:
-                    if args['--loop']:
-                        dic = self.obj.data_wrapper(args)
-                        outp.update(dic)
-                    else:
-                        if args['-l']:
-                            outp.update({'Data size:': self.obj.data_size()})
-                        if args['-s']:
-                            outp.update({'Data sample:': self.obj.sample()})
-                except NameError:
-                    self.log.elog.info("Please load the database first.")
 
+        # this part handles loading the database with n sample size
+        if args['load'] and not self.obj:
+            self.obj = core.loader.Loader(args['--test'])
+            self.log.elog.info("Database was loaded!")
+
+        # this part wraps actions that are carried out directly on the
+        # sample set without extensive functions
+        elif args['data'] and self.obj:
+                if args['--loop']:
+                    dic = self.obj.data_wrapper(args)
+                    outp.update(dic)
+                else:
+                    if args['-l']:
+                        outp.update({'Data size:': self.obj.data_size()})
+                    if args['-s']:
+                        outp.update({'Data sample:': self.obj.sample()})
+        else:
+            self.log.elog.info("Please load the database first.")
+
+        # if there's any output to display, do so
         if outp:
             for key, value in outp.iteritems():
                 print key + " "*(20-len(key)) + str(value)
@@ -83,6 +89,7 @@ def main(store):
     inp = raw_input('>> ').split()
     if inp != '-q':
         try:
+            # TODO: the data object gets lost if a help function is called
             args = docopt(__doc__, argv=inp, version=__version__)
             #if not args['--verbose']:
             #    sys.stdout = open(os.getcwd()+'/log/log.log', 'w')
