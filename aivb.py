@@ -91,17 +91,13 @@ def main(store):
     inp = raw_input('>> ').split()
     if inp != '-q':
         try:
-            # TODO: the data object gets lost if a help function is called
             args = docopt(__doc__, argv=inp, version=__version__)
-            #if not args['--verbose']:
-            #    sys.stdout = open(os.getcwd()+'/log/log.log', 'w')
             if not store:
                 store = Wrapper()
             store.route(args)
-            return store
         except (Exception, SystemExit) as e:
             print "Error: "+str(e)
-
+        return store  # keep here to return object on error
     else:
         raise SystemExit
 

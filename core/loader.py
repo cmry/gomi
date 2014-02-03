@@ -4,6 +4,7 @@ import json
 import os
 from logger import *
 from timer import *
+from grapher import *
 
 
 class Loader:
@@ -14,6 +15,7 @@ class Loader:
         self.log = Logger()
         self.args = args
         self.time = Timer()
+        self.graph = Grapher()
 
     def fetch_data(self, n):
         try:
@@ -36,8 +38,7 @@ class Loader:
         return data
 
     def data_wrapper(self, args):
-        #TODO: 0 frequencies in comment dates, populated articles returns 0
-        cmt_count, timeline = {'Populated Articles': 0}, {'Article_dates': {}, 'Comment_dates': {}}
+        cmt_count, timeline = {'Populated Articles': None}, {'Article_dates': {}, 'Comment_dates': {}}
         sec_loop = False
         for x in range(0, len(self.data)):
             doc = self.data[x]
@@ -52,7 +53,15 @@ class Loader:
                     cmt = cmt_list[i]
                     if args['-t']:
                         timeline = self.time.time_comms(timeline, cmt)
-        return cmt_count.items() + timeline.items()
+        self.graph.comm_chart(timeline)
+        return self.snip(cmt_count.items() + timeline.items())
+
+    def snip(self, dic):
+        for k in dic:
+            if not k[1]:
+                del dic[dic.index(k)]
+        return dic
+
 
     def data_size(self):
         return len(self.data)
@@ -60,6 +69,6 @@ class Loader:
     def sample(self):
         return json.dumps(self.data[0], sort_keys=False, indent=4, separators=(',', ': '))
 
-    def count_docs(self, c_count, x):
-        c_count['Populated Articles'] += 1 if self.data[x]['comments'] else 0  # doc
-        return c_count
+    def count_docs(self, cmt_count, doc):
+        cmt_count['Populated Articles'] += 1 if doc['comments'] else 0  # doc
+        return cmt_count
