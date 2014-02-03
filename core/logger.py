@@ -33,5 +33,6 @@ class Logger:
         self.rlog = logging.getLogger('scraper')
         self.nlog = logging.getLogger('nu.nl')
         self.tlog = logging.getLogger('tweakers')
-        self.elog = logging.getLogger('eval')
+        self.elog = logging.getLogger('core')
+        self.llog = logging.getLogger('loader')
         self.halt = False
