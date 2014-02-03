@@ -3,14 +3,17 @@ __author__ = 'chris'
 import json
 import os
 from logger import *
+from timer import *
 
 
 class Loader:
 
-    def __init__(self, n):
+    def __init__(self, args):
 
-        self.data = self.fetch_data(n)
+        self.data = self.fetch_data(args['--test'])
         self.log = Logger()
+        self.args = args
+        self.time = Timer()
 
     def fetch_data(self, n):
         try:
@@ -33,8 +36,23 @@ class Loader:
         return data
 
     def data_wrapper(self, args):
-        for art in self.data:
-            print art
+        #TODO: 0 frequencies in comment dates, populated articles returns 0
+        cmt_count, timeline = {'Populated Articles': 0}, {'Article_dates': {}, 'Comment_dates': {}}
+        sec_loop = False
+        for x in range(0, len(self.data)):
+            doc = self.data[x]
+            cmt_list = doc.pop('comments')
+            if args['-e']:
+                cmt_count = self.count_docs(cmt_count, doc)
+            if args['-t']:
+                sec_loop = True
+                timeline = self.time.time_docs(timeline, doc)
+            if sec_loop:
+                for i in range(0, len(cmt_list)):
+                    cmt = cmt_list[i]
+                    if args['-t']:
+                        timeline = self.time.time_comms(timeline, cmt)
+        return cmt_count.items() + timeline.items()
 
     def data_size(self):
         return len(self.data)
@@ -42,5 +60,6 @@ class Loader:
     def sample(self):
         return json.dumps(self.data[0], sort_keys=False, indent=4, separators=(',', ': '))
 
-    def empty_docs(self, x):
-        yield self.data[x]['comments']
+    def count_docs(self, c_count, x):
+        c_count['Populated Articles'] += 1 if self.data[x]['comments'] else 0  # doc
+        return c_count

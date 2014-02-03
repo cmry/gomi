@@ -6,7 +6,7 @@ __doc__ = """ AIVB
 
  Usage:
     aivb load [--test=N]
-    aivb data [-l] [-s] [--loop] [-e]
+    aivb data [-l] [-s] [--loop] [-e] [-t]
     aivb (-h | --help)
     aivb (-q | --quit)
     aivb --version
@@ -26,6 +26,7 @@ __doc__ = """ AIVB
     -l                  get the length of the total dataset
     -e                  get the amount of missing comments
     -s                  print sample of the output
+    -t                  print the list of different dates
 
  Misc:
     -h, --help          show this help message and exit
@@ -38,6 +39,7 @@ __doc__ = """ AIVB
 import sys, os
 import core
 from docopt import docopt  # install with pip
+from traceback import print_tb
 
 
 class Wrapper:
@@ -57,11 +59,11 @@ class Wrapper:
     def route(self, args):
         """ The route functions handles the arguments and pipes them to
         the appropriate functions. """
-        outp = {}; reload(core)
+        outp = {}
 
         # this part handles loading the database with n sample size
         if args['load'] and not self.obj:
-            self.obj = core.loader.Loader(args['--test'])
+            self.obj = core.loader.Loader(args)
             self.log.elog.info("Database was loaded!")
 
         # this part wraps actions that are carried out directly on the
@@ -99,10 +101,12 @@ def main(store):
             return store
         except (Exception, SystemExit) as e:
             print "Error: "+str(e)
+
     else:
         raise SystemExit
 
 if __name__ == '__main__':
     store = None; print "Starting AIVB - type: '-q' to quit & '-h' for help"
     while True:
+        reload(core)
         store = main(store)
