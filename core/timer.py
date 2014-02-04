@@ -1,7 +1,7 @@
 __author__ = 'chris'
 
 
-class Timer():
+class Timer:
     """ Class to properly parse and return the dates in our
     dataset. Works with {'Article_dates': {}, 'Comment_dates': {}}. """
 
@@ -29,9 +29,12 @@ class Timer():
 
     def parse_date(self, jdoc, prep=str()):
         # TODO: this part might have to be changed due to date format
-        date = jdoc[prep+'date'].split()
-        return str(self.parse_day(date[0]) + "/" + self.parse_month(date[1]) + "/" +
-                   jdoc[prep+'year'])  # + " " + jdoc['time']) <-- uncomment for time
+        try:
+            date = jdoc[prep+'date'].split()
+            return str(self.parse_day(date[0]) + "/" + self.parse_month(date[1]) + "/" +
+                       jdoc[prep+'year'])  # + " " + jdoc['time']) <-- uncomment for time
+        except IndexError:
+            return 'UNK'
 
     def parse_day(self, day):
         if int(day) < 10:
@@ -53,4 +56,4 @@ class Timer():
             'november':     '11',
             'december':     '12'
         }
-        return datel[date]
+        return datel[date.lower()]

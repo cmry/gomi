@@ -5,7 +5,7 @@ __version__ = 'Version 03.02'  # update by date on subclass change
 __doc__ = """ AIVB
 
  Usage:
-    aivb load [--test=N]
+    aivb load [--slice=N]
     aivb data [-l] [-s] [--loop] [-e] [-t]
     aivb (-h | --help)
     aivb (-q | --quit)
@@ -19,7 +19,7 @@ __doc__ = """ AIVB
 
  Load:
     --loop              wrap actions that need a loop to process (-e)
-    --test=N            specify the amount of articles you want to use for a test
+    --slice=N            specify the amount of articles you want to use for a test
                         set to soften memory load on dev
 
  Data:
@@ -36,15 +36,13 @@ __doc__ = """ AIVB
 
 """
 
-import sys, os
 import core
 from docopt import docopt  # install with pip
-from traceback import print_tb
 
 
 class Wrapper:
 
-    def __init__(self):
+    def __init__(self, log):
         """ This module is used to carry out functions
          within the program, it basically routs command line parameters
          parsed from the init class to the wrapper module from which it
@@ -54,7 +52,7 @@ class Wrapper:
          to the main class as well. """
 
         self.obj = None
-        self.log = core.logger.Logger()
+        self.log = log
 
     def route(self, args):
         """ The route functions handles the arguments and pipes them to
@@ -63,7 +61,7 @@ class Wrapper:
 
         # this part handles loading the database with n sample size
         if args['load'] and not self.obj:
-            self.obj = core.loader.Loader(args)
+            self.obj = core.loader.Loader(args, log)
             self.log.elog.info("Database was loaded!")
 
         # this part wraps actions that are carried out directly on the
@@ -85,24 +83,23 @@ class Wrapper:
             for key, value in outp.iteritems():
                 print key + " "*(20-len(key)) + str(value)
 
-
-
-def main(store):
+def main(store, log):
     inp = raw_input('>> ').split()
     if inp != '-q':
         try:
             args = docopt(__doc__, argv=inp, version=__version__)
             if not store:
-                store = Wrapper()
+                store = Wrapper(log)
             store.route(args)
         except (Exception, SystemExit) as e:
-            print "Error: "+str(e)
-        return store  # keep here to return object on error
+            log.elog.exception("Error: ")
+        return store, log  # keep here to return object on error
     else:
         raise SystemExit
 
 if __name__ == '__main__':
     store = None; print "Starting AIVB - type: '-q' to quit & '-h' for help"
+    log = core.logger.Logger()
     while True:
         reload(core)
-        store = main(store)
+        store, log = main(store, log)
