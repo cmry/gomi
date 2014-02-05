@@ -3,27 +3,31 @@
 __author__ = 'chris'
 __version__ = 'Version 05.02'
 
-from aivb import AIVB
 import crunch
 from copy import deepcopy
 
 
-class Wrapper(AIVB):
+class Wrapper:
 
-    """ This module is used to carry out functions
-     within the program, it basically routs command line parameters
-     parsed from the init class to the wrapper module from which it
-     will call the appropriate classes.
+    def __init__(self, args, log, data):
+        """ This module is used to carry out functions
+         within the program, it basically routs command line parameters
+         parsed from the init class to the wrapper module from which it
+         will call the appropriate classes.
 
-     Just plug stable class dailies in here, don't forget to add self.args
-     to the main class as well. """
+         Just plug stable class dailies in here, don't forget to add self.args
+         to the main class as well. """
+
+        self.args = args
+        self.log = log
+        self.data = data
 
     def route(self):
         """ The route functions handles the arguments and pipes them to
         the appropriate functions. """
 
         reload(crunch)
-        mill = crunch.mill.Mill()
+        mill = crunch.mill.Mill(self.data, self.log)
         outp = {}
 
         print self.args

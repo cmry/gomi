@@ -45,6 +45,7 @@ class AIVB:
     def __init__(self):
 
         #TODO: get rid of double print from log
+        #TODO: pass around the data class NAME instead of the actual data
         self.log = core.logger.Logger()
         self.data = None
         self.args = None
@@ -63,7 +64,7 @@ class AIVB:
                     self.call_loader(self.args)
                 # if loaded, call the wrapper
                 elif self.data:
-                    self.wrap_args()
+                    self.wrap_args(self.args, self.log, self.data)
                 # else yield waring
                 else:
                     self.log.elog.warning("Please load the database first.")
@@ -78,11 +79,10 @@ class AIVB:
 
     def call_loader(self, args):
         load = core.loader.Loader(self.log)
-        self.data = load.fetch_data(args['--slice'])
-        del load
+        load.fetch_data(args['--slice'])
 
-    def wrap_args(self):
-        wrap = core.wrapper.Wrapper()
+    def wrap_args(self, args, log, data):
+        wrap = core.wrapper.Wrapper(args, log, data)
         wrap.route()
         del wrap
 

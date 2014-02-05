@@ -3,11 +3,14 @@
 __author__ = 'chris'
 __version__ = 'Version 05.02'
 
-from aivb import AIVB
 import json
 
 
-class Mill(AIVB):
+class Mill:
+
+    def __init__(self, log, data):
+        self.log = log
+        self.data = data
 
     def parse_output(self, output, args):
         """ Parse the obtained information in the right output and route
