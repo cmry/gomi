@@ -1,4 +1,7 @@
+#!/usr/bin/env python
+
 __author__ = 'chris'
+__version__ = 'Version 04.02'
 
 
 class Timer:

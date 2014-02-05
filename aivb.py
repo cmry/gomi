@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 __author__ = 'chris'
-__version__ = 'Version 03.02'  # update by date on subclass change
+__version__ = 'Version 05.02'  # update by date on subclass change
 __doc__ = """ AIVB
 
  Usage:
@@ -12,7 +12,7 @@ __doc__ = """ AIVB
     aivb --version
 
  Arguments:
-    eval                this is the evaluation module for the scraped articles
+    crunch              this is the evaluation module for the scraped articles
     load                loads the results placed in ../res in the working memory,
                         which might take a while to process depending on the size
     data                this executes commands that are directly based on the data
@@ -37,69 +37,57 @@ __doc__ = """ AIVB
 """
 
 import core
+import crunch
 from docopt import docopt  # install with pip
 
 
-class Wrapper:
+class AIVB:
 
-    def __init__(self, log):
-        """ This module is used to carry out functions
-         within the program, it basically routs command line parameters
-         parsed from the init class to the wrapper module from which it
-         will call the appropriate classes.
+    def __init__(self):
 
-         Just plug stable class dailies in here, don't forget to add args
-         to the main class as well. """
+        self.log = core.logger.Logger()
+        self.data = None
+        self.args = None
+        while True:
+            self.boot_env()
 
-        self.obj = None
-        self.log = log
+    def boot_env(self):
 
-    def route(self, args):
-        """ The route functions handles the arguments and pipes them to
-        the appropriate functions. """
-        outp = {}
+        self.reload_mods('all')
+        inp = raw_input('>> ').split()
 
-        # this part handles loading the database with n sample size
-        if args['load'] and not self.obj:
-            self.obj = core.loader.Loader(args, log)
-            self.log.elog.info("Database was loaded!")
-
-        # this part wraps actions that are carried out directly on the
-        # sample set without extensive functions
-        elif args['data'] and self.obj:
-                if args['--loop']:
-                    dic = self.obj.data_wrapper(args)
-                    outp.update(dic)
+        if inp != '-q':
+            try:
+                self.args = docopt(__doc__, argv=inp, version=__version__)
+                # this part handles loading the database with n sample size
+                if self.args['load'] and not self.data:
+                    self.call_loader(self)
+                # if loaded, call the wrapper
+                elif self.data:
+                    self.wrap_args()
+                # else yield waring
                 else:
-                    if args['-l']:
-                        outp.update({'Data size:': self.obj.data_size()})
-                    if args['-s']:
-                        outp.update({'Data sample:': self.obj.sample()})
+                    self.log.elog.warning("Please load the database first.")
+            except (Exception, SystemExit):
+                self.log.elog.exception("Error: ")
         else:
-            self.log.elog.info("Please load the database first.")
+            raise SystemExit
 
-        # if there's any output to display, do so
-        if outp:
-            for key, value in outp.iteritems():
-                print key + " "*(20-len(key)) + str(value)
+    def reload_mods(self, target):
+        if target == 'all':
+            reload(core)
+            reload(crunch)
+        if target == 'crunch':
+            reload(crunch)
 
-def main(store, log):
-    inp = raw_input('>> ').split()
-    if inp != '-q':
-        try:
-            args = docopt(__doc__, argv=inp, version=__version__)
-            if not store:
-                store = Wrapper(log)
-            store.route(args)
-        except (Exception, SystemExit) as e:
-            log.elog.exception("Error: ")
-        return store, log  # keep here to return object on error
-    else:
-        raise SystemExit
+    def call_loader(self, args):
+        load = core.loader.Loader()
+        self.data = load.fetch_data(args['--slice'])
+
+    def wrap_args(self):
+        wrap = core.wrapper.Wrapper()
+        wrap.route(crunch.mill.Mill)
 
 if __name__ == '__main__':
-    store = None; print "Starting AIVB - type: '-q' to quit & '-h' for help"
-    log = core.logger.Logger()
-    while True:
-        reload(core)
-        store, log = main(store, log)
+    print "Starting AIVB - type: '-q' to quit & '-h' for help"
+    AIVB()
