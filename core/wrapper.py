@@ -4,6 +4,7 @@ __author__ = 'chris'
 __version__ = 'Version 05.02'
 
 import aivb
+import crunch
 from copy import deepcopy
 
 
@@ -17,11 +18,11 @@ class Wrapper(aivb.AIVB):
      Just plug stable class dailies in here, don't forget to add self.args
      to the main class as well. """
 
-    def route(self, mill):
+    def route(self):
         """ The route functions handles the arguments and pipes them to
         the appropriate functions. """
 
-        self.reload_mods('crunch')
+        mill = crunch.mill.Mill()
         outp = {}
 
         # this part wraps actions that are carried out directly on the

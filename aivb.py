@@ -37,7 +37,6 @@ __doc__ = """ AIVB
 """
 
 import core
-import crunch
 from docopt import docopt  # install with pip
 
 
@@ -76,9 +75,6 @@ class AIVB:
     def reload_mods(self, target):
         if target == 'all':
             reload(core)
-            reload(crunch)
-        if target == 'crunch':
-            reload(crunch)
 
     def call_loader(self, args):
         load = core.loader.Loader()
@@ -86,7 +82,7 @@ class AIVB:
 
     def wrap_args(self):
         wrap = core.wrapper.Wrapper()
-        wrap.route(crunch.mill.Mill)
+        wrap.route()
 
 if __name__ == '__main__':
     print "Starting AIVB - type: '-q' to quit & '-h' for help"
