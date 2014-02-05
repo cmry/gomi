@@ -37,7 +37,6 @@ __doc__ = """ AIVB
 """
 
 import core
-import crunch
 from docopt import docopt  # install with pip
 
 
@@ -45,6 +44,7 @@ class AIVB:
 
     def __init__(self):
 
+        #TODO: get rid of double print from log
         self.log = core.logger.Logger()
         self.data = None
         self.args = None
@@ -52,7 +52,6 @@ class AIVB:
             self.boot_env()
 
     def boot_env(self):
-
         self.reload_mods('all')
         inp = raw_input('>> ').split()
 
@@ -60,8 +59,8 @@ class AIVB:
             try:
                 self.args = docopt(__doc__, argv=inp, version=__version__)
                 # this part handles loading the database with n sample size
-                if self.args['load'] and not self.data:
-                    self.call_loader(self)
+                if self.args['load'] or not self.data:
+                    self.call_loader(self.args)
                 # if loaded, call the wrapper
                 elif self.data:
                     self.wrap_args()
@@ -76,17 +75,16 @@ class AIVB:
     def reload_mods(self, target):
         if target == 'all':
             reload(core)
-            reload(crunch)
-        if target == 'crunch':
-            reload(crunch)
 
     def call_loader(self, args):
-        load = core.loader.Loader()
+        load = core.loader.Loader(self.log)
         self.data = load.fetch_data(args['--slice'])
+        del load
 
     def wrap_args(self):
         wrap = core.wrapper.Wrapper()
-        wrap.route(crunch.mill.Mill)
+        wrap.route()
+        del wrap
 
 if __name__ == '__main__':
     print "Starting AIVB - type: '-q' to quit & '-h' for help"
