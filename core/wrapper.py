@@ -3,12 +3,12 @@
 __author__ = 'chris'
 __version__ = 'Version 05.02'
 
-import aivb
+from aivb import AIVB
 import crunch
 from copy import deepcopy
 
 
-class Wrapper(aivb.AIVB):
+class Wrapper(AIVB):
 
     """ This module is used to carry out functions
      within the program, it basically routs command line parameters
@@ -22,6 +22,7 @@ class Wrapper(aivb.AIVB):
         """ The route functions handles the arguments and pipes them to
         the appropriate functions. """
 
+        reload(crunch)
         mill = crunch.mill.Mill()
         outp = {}
 

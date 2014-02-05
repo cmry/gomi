@@ -3,12 +3,12 @@
 __author__ = 'chris'
 __version__ = 'Version 04.02'
 
-import aivb  # main class
+from aivb import AIVB  # main class
 import json
 import os
 
 
-class Loader(aivb.AIVB):
+class Loader(AIVB):
 
     def fetch_data(self, n):
         """ This function opens all the files up to n given
@@ -17,18 +17,18 @@ class Loader(aivb.AIVB):
 
         data, n = [], int(n)
 
-        while n is not 0:
-            # as long as we're in the slice range, get files
-            for fl in os.listdir(os.getcwd()+"/res"):
-                if fl.endswith(".txt"):  # avoid litter
-                    with open(os.getcwd()+"/res/"+fl, 'r') as f:
-                        try:
-                            jf = json.load(f)
-                            data.append(jf)
-                        except ValueError:  # this might be unnecessary
-                            self.log.llog.warning("JSON file " + str(f) + " was not recognized!")
-                    n -= 1
-                else:
-                    self.log.llog.warning("A non .txt was detected!")
+        # as long as we're in the slice range, get files
+        for fl in os.listdir(os.getcwd()+"/res"):
+            if n > 0: break
+            if fl.endswith(".txt"):  # avoid litter
+                with open(os.getcwd()+"/res/"+fl, 'r') as f:
+                    try:
+                        jf = json.load(f)
+                        data.append(jf)
+                    except ValueError:  # this might be unnecessary
+                        self.log.llog.warning("JSON file " + str(f) + " was not recognized!")
+                n -= 1
+            else:
+                self.log.llog.warning("A non .txt was detected!")
         self.log.llog.info("Database was loaded!")
         return data

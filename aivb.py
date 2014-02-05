@@ -47,8 +47,6 @@ class AIVB:
         self.log = core.logger.Logger()
         self.data = None
         self.args = None
-        while True:
-            self.boot_env()
 
     def boot_env(self):
 
@@ -60,7 +58,7 @@ class AIVB:
                 self.args = docopt(__doc__, argv=inp, version=__version__)
                 # this part handles loading the database with n sample size
                 if self.args['load'] and not self.data:
-                    self.call_loader(self)
+                    self.call_loader(self.args)
                 # if loaded, call the wrapper
                 elif self.data:
                     self.wrap_args()
@@ -79,11 +77,15 @@ class AIVB:
     def call_loader(self, args):
         load = core.loader.Loader()
         self.data = load.fetch_data(args['--slice'])
+        del load
 
     def wrap_args(self):
         wrap = core.wrapper.Wrapper()
         wrap.route()
+        del wrap
 
 if __name__ == '__main__':
     print "Starting AIVB - type: '-q' to quit & '-h' for help"
-    AIVB()
+    aivb = AIVB()
+    while True:
+        aivb.boot_env()
