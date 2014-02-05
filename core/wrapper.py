@@ -26,6 +26,8 @@ class Wrapper(AIVB):
         mill = crunch.mill.Mill()
         outp = {}
 
+        print self.args
+
         # this part wraps actions that are carried out directly on the
         # sample set without extensive functions
         if self.args['--loop']:

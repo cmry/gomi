@@ -3,12 +3,21 @@
 __author__ = 'chris'
 __version__ = 'Version 04.02'
 
-from aivb import AIVB  # main class
 import json
 import os
 import sys
 
-class Loader(AIVB):
+
+class Loader:
+
+    def __init__(self, log):
+        """ This class is used to load an n amount of data and
+        pass it back to the main function, nothing more. """
+
+        self.data = []
+        self.log = log
+        # TODO: build dump fuction
+        # TODO: continue working on wrapper
 
     def fetch_data(self, n):
         """ This function opens all the files up to n given
@@ -35,5 +44,7 @@ class Loader(AIVB):
         return data
 
     def perc(self, curr, tot):
+        """ Small function to display percentage of total for
+        decreasing range. """
         print >> sys.stdout, "\r%d%%" % (int(float(100)-(float(curr)/float(tot)*100))),
         sys.stdout.flush()

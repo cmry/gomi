@@ -44,12 +44,14 @@ class AIVB:
 
     def __init__(self):
 
+        #TODO: get rid of double print from log
         self.log = core.logger.Logger()
         self.data = None
         self.args = None
+        while True:
+            self.boot_env()
 
     def boot_env(self):
-
         self.reload_mods('all')
         inp = raw_input('>> ').split()
 
@@ -57,7 +59,7 @@ class AIVB:
             try:
                 self.args = docopt(__doc__, argv=inp, version=__version__)
                 # this part handles loading the database with n sample size
-                if self.args['load'] and not self.data:
+                if self.args['load'] or not self.data:
                     self.call_loader(self.args)
                 # if loaded, call the wrapper
                 elif self.data:
@@ -75,7 +77,7 @@ class AIVB:
             reload(core)
 
     def call_loader(self, args):
-        load = core.loader.Loader()
+        load = core.loader.Loader(self.log)
         self.data = load.fetch_data(args['--slice'])
         del load
 
@@ -86,6 +88,4 @@ class AIVB:
 
 if __name__ == '__main__':
     print "Starting AIVB - type: '-q' to quit & '-h' for help"
-    aivb = AIVB()
-    while True:
-        aivb.boot_env()
+    AIVB()
