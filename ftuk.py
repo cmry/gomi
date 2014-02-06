@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
 __author__ = 'chris'
-__version__ = 'Version 30.01'  # update by date on subclass change
+__version__ = 'Version 06.02'  # update by date on subclass change
 __doc__ = """ FTUK!
 
  Usage:
-    ftuk [-v] freq [-rcit] <input>... [--sortk=key] [--top=N] [--perc] [--tex] [--ngr=N] [--amb]
+    ftuk [-v] freq [-srcit] <input>... [--sortk=key] [--top=N] [--perc] [--tex] [--ngr=N] [--amb]
     ftuk [-v] fix <input>
-    ftuk [-v] map [-cit] <input>... [--top=N] [--ttop=N] [--perc] [--tex] [--all]
+    ftuk [-v] map [-srcit] <input>... [--top=N] [--ttop=N] [--perc] [--tex] [--all]
     ftuk (-h | --help)
     ftuk --version
 
@@ -20,7 +20,8 @@ __doc__ = """ FTUK!
                         candidate, inherits a lot of code from freq but
                         splitted for better overview
  Freq:
-    -r, --replace       use a replacement method compare dicts
+    -s, --sanitize      make sure that GS and STR lists are the same
+    -r, --errors        count the errors between GS and STR
     -c, --cor               list the column with correctly learned tags
     -i, --inc               list the column with incorrectly learned tags
     -t, --tot               list the column with the total amount of tags

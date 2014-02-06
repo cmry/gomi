@@ -9,6 +9,7 @@ from collections import OrderedDict
 from itertools import islice
 from pandas import DataFrame
 from re import findall
+from copy import deepcopy
 
 
 class Mapper(tagger.Tagger):
@@ -55,19 +56,10 @@ class Mapper(tagger.Tagger):
                           "Mapper Tuple Err: ": len(verrs)})
         return D
 
-    def plus_tag(self, D, D2, tag):
-        if tag[3] not in D:
-            D[tag[3]] = {}
-        if tag[2] not in D[tag[3]]:
-            D[tag[3]] = dict(D2)
-            D[tag[3]][tag[2]] += 1
-        else:
-            D[tag[3]][tag[2]] += 1
-        return D
-
     def get_D2(self):
+        """ Generates an empty dictionary with all POS tags. """
         D2 = {}
-        for tag in set(findall('\[[A-Z\$:=]+]', str(self.gs))):
+        for tag in set(findall('\[[A-Z:]+.?\]', str(self.gs))):
             if tag not in D2: D2[tag] = 0  # errors in outer scope
         return D2
 
@@ -82,18 +74,19 @@ class Mapper(tagger.Tagger):
         errs = []
 
         for key, value in inf_D.iteritems():
-            try:
-                for tag in value:
-                    if self.args['--all']:
-                        if tag[1]:
-                            D = self.plus_tag(D, D2, tag)
-                    else:
-                        D = self.plus_tag(D, D2, tag)
-            except (IndexError, KeyError) as e:
-                errs.append(e)
+            for tag in value:
+                if tag[3] not in D.keys():
+                    D[tag[3]] = {}
+                if tag[2] not in D[tag[3]]:
+                    D[tag[3]] = deepcopy(D2)
+                try:
+                    D[tag[3]][tag[2]] += 1
+                except KeyError:
+                    pass
+        if not self.args['--all']:
+            del D['[INC]']
 
         self.logd.update({"Mapper Wrong List: ": len(errs)})
-
         return D
 
     def map_perc(self, D):
@@ -119,6 +112,7 @@ class Mapper(tagger.Tagger):
         return D
 
     def gen_map_output(self):
+        # TODO: sorting is still fucked
         D, args = self.mapping(), self.args
         if args['--perc']:
             D5 = self.map_perc(D)

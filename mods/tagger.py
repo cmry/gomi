@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 __author__ = 'chris'
-__version__ = 'Version 23.01'
+__version__ = 'Version 06.02'
 
 from re import sub, findall, search
 from pandas import DataFrame
@@ -23,42 +23,34 @@ class Tagger:
         self.col = self.get_col()
         self.logd = {}
 
-        if not self.args['--replace']:
-            # cut longer than wsj(x) variable
-            self.gs, tgs = [], open(getcwd()+'/corp/wsj10.gold.fix', 'r').readlines()
-            for line in tgs:
-                if len(line.split(' @@@ ')[0].split(' ')) <= int(findall('[0-9]+', struc)[0]):
-                    self.gs.append(line)
-
-            # output files do not contain spaces, fix for cc.py
-            self.struc, tstruc = [], open(struc, 'r').readlines()
-            for line in tstruc:
-                if not line.startswith('#'):
-                    self.struc.append(line.replace(')', ') ').replace(',', ', '))
-        else:
+        if self.args['--sanitize']:
+            tstruc, tgs = open(struc, 'r').readlines(), open(getcwd()+'/corp/wsj10.gold.fix', 'r').readlines()
+            strucD, gsD = self.doc_D(tstruc, tgs)
             self.gs, self.struc = [], []
-            tgs = [x for x in open(getcwd()+'/corp/wsj10.gold.fix', 'r').readlines() if len(x.split(' @@@ ')[0].split(' ')) <= int(findall('[0-9]+', struc)[0])]
-            tstruc = [x for x in open(struc, 'r').readlines()]
+            self.sanitize_D(strucD, gsD)
+        else:
+            # cut longer than wsj(x) variable
+            self.gs = [x for x in open(getcwd()+'/corp/wsj10.gold.fix', 'r').readlines()
+                       if len(x.split(' @@@ ')[0].split(' ')) <= int(findall('[0-9]+', struc)[0])]
+            # output files do not contain spaces, fix for cc.py
+            self.struc = [x.replace(')', ') ').replace(',', ', ') for x in open(struc, 'r').readlines()
+                          if not x.startswith('#')]
 
-            for line in tstruc:
-                line = line.replace(')', ') ').replace(',', ', ')
-                for line2 in tgs:
-                    if line.split(' @@@ ')[0] in line2.split(' @@@ ')[0]:
-                        self.gs.append(line2)
-                        self.struc.append(line)
-                        break
+        # count non matching sentences between struc and gs
+        count = self.find_errors() if self.args['--errors'] else 0
 
         self.logd.update({"Method: ":          str(struc).replace(getcwd()+'/corp/wsj10.', ''),
                           "Total GS items: ":  len(self.gs),
-                          "Total ST items: ":  len(self.struc)})
+                          "Total ST items: ":  len(self.struc),
+                          "Non-matches: ":     count if count else "-"})
 
     def logger(self, logd):
         """ Used for displaying some metrics determined by a long-ass
             OCD list. Accepts a dict with metric names and values and
             formats them so they look neat in terminal. """
 
-        order = {k: v for v, k in enumerate(['Method: ', 'Total GS items: ', 'Total ST items: ', 'True tags: ',
-                                             'False tags: ', 'Ambiguous: ', 'Branch Err: ', 'Misc Err: ',
+        order = {k: v for v, k in enumerate(['Method: ', 'Total GS items: ', 'Total ST items: ', 'Non-matches: ',
+                                             'True tags: ', 'False tags: ', 'Ambiguous: ', 'Branch Err: ', 'Misc Err: ',
                                              'Total sents GS: ', 'Total sents ST: ', 'Seen items: ',
                                              'Total structs GS: ', '--------------------------'])}
         logd = OrderedDict(sorted(logd.items(), key=lambda i: order.get(i[0])))
@@ -69,6 +61,43 @@ class Tagger:
     def frame_ord(self, data, r, c):
         """ This is just a small wrapper for pandas DataFrame. """
         return DataFrame(data, index=r, columns=c)
+
+    def doc_D(self, tstruc, tgs, strucD={}, gsD={}):
+        """ This function will generate two dicts with the sentences
+        as keys and the structures as values. """
+        # form dicts for both the files
+        for line in tstruc:
+            if not line.startswith('#'):
+                line = line.split(' @@@ ')
+                strucD[line[0]] = line[1].replace(')', ') ').replace(',', ', ')
+        for line in tgs:
+            line = line.split(' @@@ ')
+            gsD[line[0]] = line[1]
+
+        return strucD, gsD
+
+    def sanitize_D(self, strucD, gsD):
+        """ Will sanitize the dictionary created by doc_D and return
+        a list. """
+        for key, value in strucD.iteritems():
+            if key in gsD:
+                self.struc.append(' @@@ '.join([key, value]))
+
+        for key, value in gsD.iteritems():
+            if key in strucD:
+                self.gs.append(' @@@ '.join([key, value]))
+
+    def find_errors(self, count=0):
+        """ This function finds errors in the struc and gs attributes. """
+        for line in self.struc:
+                line = line.split(' @@@ ')[0]
+                if not any(line in x for x in self.gs):
+                    count += 1
+        for line in self.gs:
+            line = line.split(' @@@ ')[0]
+            if not any(line in x for x in self.struc):
+                count += 1
+        return count
 
     def build_D(self, fl, clean=None):
         """ Dick 1 is a dictionary with the GS words as keys and a list
@@ -159,7 +188,6 @@ class Tagger:
         for K1, V1 in D1.iteritems():
             try:
                 V4 = D4[K1]
-                checkl.append(V4)
                 for i in range(0, len(V4)-1):  # -1 to ignore \n
                     if not self.args['--ngr']:
                         if V4[i] and '--cor' in self.col:
@@ -176,6 +204,7 @@ class Tagger:
                             D[' '.join(V1[0][i-int(self.args['--ngr']):i])][self.col.keys().index('--inc')] += 1
                         if '--tot' in self.col:
                             D[' '.join(V1[0][i-int(self.args['--ngr']):i])][self.col.keys().index('--tot')] += 1
+                checkl.append(V4)
             except KeyError as e:
                 # "Estimated volume was a moderate 3.5 million ounces" seems to
                 # error for some reason
