@@ -8,7 +8,8 @@ __doc__ = """ AIVB
     aivb mongo load [-a] [--slice=N]
     aivb mongo search --key=k --value=v
     aivb mongo del [-x]
-    aivb data [-l] [-s] [--loop] [-e] [-t]
+    aivb data [-l] [-s]
+    aivb data loop [-e] [-t]
     aivb (-h | --help)
     aivb (-q | --quit)
     aivb --version
@@ -29,6 +30,7 @@ __doc__ = """ AIVB
     --value=v           value to match the key searching in db
 
  Data:
+    loop
     -l                  get the length of the total dataset
     -e                  get the amount of missing comments
     -s                  print sample of the output
