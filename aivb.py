@@ -1,26 +1,32 @@
 #!/usr/bin/env python
 
 __author__ = 'chris'
-__version__ = 'Version 05.02'  # update by date on subclass change
+__version__ = 'Version 06.02'  # update by date on subclass change
 __doc__ = """ AIVB
 
  Usage:
-    aivb load [--slice=N]
+    aivb mongo load [-a] [--slice=N]
+    aivb mongo search --key=k --value=v
+    aivb mongo del [-x]
     aivb data [-l] [-s] [--loop] [-e] [-t]
     aivb (-h | --help)
     aivb (-q | --quit)
     aivb --version
 
  Arguments:
-    crunch              this is the evaluation module for the scraped articles
-    load                loads the results placed in ../res in the working memory,
-                        which might take a while to process depending on the size
+    mongo               used to interface with MongoDB (loading, unloading, etc.)
     data                this executes commands that are directly based on the data
+    crunch              this is the evaluation module for the scraped articles
 
- Load:
-    --loop              wrap actions that need a loop to process (-e)
-    --slice=N            specify the amount of articles you want to use for a test
+ Mongo:
+    load                insert an N amount of articles
+    remove              clear the database of all current articles
+    -a                  will load the complete dataset, WARNING!
+    -x                  display the instances being deleted
+    --slice=N           specify the amount of articles you want to use for a test
                         set to soften memory load on dev
+    --key=k             key in order to search in MongoDB
+    --value=v           value to match the key searching in db
 
  Data:
     -l                  get the length of the total dataset
@@ -43,49 +49,20 @@ from docopt import docopt  # install with pip
 class AIVB:
 
     def __init__(self):
+        """ This class is used to call all the required classes
+        in core as parent and pass them down to their childs. Can
+        be extended if the scraper is also integrated.s """
 
-        #TODO: get rid of double print from log
-        #TODO: pass around the data class NAME instead of the actual data
         self.log = core.logger.Logger()
-        self.data = None
-        self.args = None
-        while True:
-            self.boot_env()
+        self.mongo = core.mongo.Mongo()
+        self.args = core.args.Arguments()
+        self.boot()
 
-    def boot_env(self):
-        self.reload_mods('all')
-        inp = raw_input('>> ').split()
-
-        if inp != '-q':
-            try:
-                self.args = docopt(__doc__, argv=inp, version=__version__)
-                # this part handles loading the database with n sample size
-                if self.args['load'] or not self.data:
-                    self.call_loader(self.args)
-                # if loaded, call the wrapper
-                elif self.data:
-                    self.wrap_args(self.args, self.log, self.data)
-                # else yield waring
-                else:
-                    self.log.elog.warning("Please load the database first.")
-            except (Exception, SystemExit):
-                self.log.elog.exception("Error: ")
-        else:
-            raise SystemExit
-
-    def reload_mods(self, target):
-        if target == 'all':
-            reload(core)
-
-    def call_loader(self, args):
-        load = core.loader.Loader(self.log)
-        load.fetch_data(args['--slice'])
-
-    def wrap_args(self, args, log, data):
-        wrap = core.wrapper.Wrapper(args, log, data)
+    def boot(self):
+        self.args.store(docopt(__doc__, version=__version__))
+        wrap = core.wrapper.Wrapper(self.args, self.log, self.mongo)
         wrap.route()
-        del wrap
+
 
 if __name__ == '__main__':
-    print "Starting AIVB - type: '-q' to quit & '-h' for help"
     AIVB()
