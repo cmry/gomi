@@ -5,7 +5,7 @@ __version__ = 'Version 30.01'  # update by date on subclass change
 __doc__ = """ FTUK!
 
  Usage:
-    ftuk [-v] freq [-cit] <input>... [--sortk=key] [--top=N] [--perc] [--tex] [--ngr=N] [--amb]
+    ftuk [-v] freq [-rcit] <input>... [--sortk=key] [--top=N] [--perc] [--tex] [--ngr=N] [--amb]
     ftuk [-v] fix <input>
     ftuk [-v] map [-cit] <input>... [--top=N] [--ttop=N] [--perc] [--tex] [--all]
     ftuk (-h | --help)
@@ -20,6 +20,7 @@ __doc__ = """ FTUK!
                         candidate, inherits a lot of code from freq but
                         splitted for better overview
  Freq:
+    -r, --replace       use a replacement method compare dicts
     -c, --cor               list the column with correctly learned tags
     -i, --inc               list the column with incorrectly learned tags
     -t, --tot               list the column with the total amount of tags
@@ -59,10 +60,6 @@ class Ftuk:
          classes.
 
          Just plug stable class dailies in here, don't forget to add args."""
-
-        # TODO: get the actual wsj10 file as gold standard
-        # TODO: check for the actual amount of tags and n-grams (2/3) in gold file
-        # TODO: compare these numbers with the actual statistics
 
         # TODO: from the top 5 n-grams (2/3), if correct output >> STRUC and GS
         #       sentence, validation by eye. Randomly output 100 sentence pairs.

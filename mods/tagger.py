@@ -3,7 +3,7 @@
 __author__ = 'chris'
 __version__ = 'Version 23.01'
 
-from re import sub, findall
+from re import sub, findall, search
 from pandas import DataFrame
 from collections import OrderedDict
 from os import getcwd
@@ -23,17 +23,30 @@ class Tagger:
         self.col = self.get_col()
         self.logd = {}
 
-        # cut longer than wsj(x) variable
-        self.gs, tgs = [], open(getcwd()+'/corp/wsj10.gold.fix', 'r').readlines()
-        for line in tgs:
-            if len(line.split(' @@@ ')[0].split(' ')) <= int(findall('[0-9]+', struc)[0]):
-                self.gs.append(line)
+        if not self.args['--replace']:
+            # cut longer than wsj(x) variable
+            self.gs, tgs = [], open(getcwd()+'/corp/wsj10.gold.fix', 'r').readlines()
+            for line in tgs:
+                if len(line.split(' @@@ ')[0].split(' ')) <= int(findall('[0-9]+', struc)[0]):
+                    self.gs.append(line)
 
-        # output files do not contain spaces, fix for cc.py
-        self.struc, tstruc = [], open(struc, 'r').readlines()
-        for line in tstruc:
-            if not line.startswith('#'):
-                self.struc.append(line.replace(')', ') ').replace(',', ', '))
+            # output files do not contain spaces, fix for cc.py
+            self.struc, tstruc = [], open(struc, 'r').readlines()
+            for line in tstruc:
+                if not line.startswith('#'):
+                    self.struc.append(line.replace(')', ') ').replace(',', ', '))
+        else:
+            self.gs, self.struc = [], []
+            tgs = [x for x in open(getcwd()+'/corp/wsj10.gold.fix', 'r').readlines() if len(x.split(' @@@ ')[0].split(' ')) <= int(findall('[0-9]+', struc)[0])]
+            tstruc = [x for x in open(struc, 'r').readlines()]
+
+            for line in tstruc:
+                line = line.replace(')', ') ').replace(',', ', ')
+                for line2 in tgs:
+                    if line.split(' @@@ ')[0] in line2.split(' @@@ ')[0]:
+                        self.gs.append(line2)
+                        self.struc.append(line)
+                        break
 
         self.logd.update({"Method: ":          str(struc).replace(getcwd()+'/corp/wsj10.', ''),
                           "Total GS items: ":  len(self.gs),
