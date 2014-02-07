@@ -77,12 +77,15 @@ class Mapper(tagger.Tagger):
             for tag in value:
                 if tag[3] not in D.keys():
                     D[tag[3]] = {}
-                if tag[2] not in D[tag[3]]:
+                if tag[2] not in D[tag[3]] and not D[tag[3]]:
                     D[tag[3]] = deepcopy(D2)
-                try:
+                    try:
+                        D[tag[3]][tag[2]] += 1
+                    except KeyError:
+                        continue
+                if tag[2] in D[tag[3]]:
                     D[tag[3]][tag[2]] += 1
-                except KeyError:
-                    pass
+
         if not self.args['--all']:
             del D['[INC]']
 
@@ -98,8 +101,6 @@ class Mapper(tagger.Tagger):
                 tot_dict[tag] += count
                 key_dict[key] += count
 
-
-        print tot_dict
         for key, value in D.iteritems():
             for tag, count in value.iteritems():
                 try:
@@ -112,7 +113,6 @@ class Mapper(tagger.Tagger):
         return D
 
     def gen_map_output(self):
-        # TODO: sorting is still fucked
         D, args = self.mapping(), self.args
         if args['--perc']:
             D5 = self.map_perc(D)

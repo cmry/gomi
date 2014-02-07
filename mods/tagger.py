@@ -168,53 +168,41 @@ class Tagger:
     def build_D5(self):
         """ Dick 5 is the result dictionary of Dick 4 and Dick 1, which
             includes all the POS tags and optionally a Correct, Incorrect
-            and Total score. These can be altered by the CLI. """
+            and Total score. These can be altered by the CLI. Updated to
+            allow for n-gram input. """
 
         D, D1, D4 = {}, self.build_D(self.gs), self.build_D4()
         errs, checkl = [], []
+        if not self.args['--ngr']:  # set default to unigram
+            self.args['--ngr'] = '1'
 
-        if not self.args['--ngr']:
-            for tag in set(findall('\[[A-Z\$]+]', str(self.gs))):
-                if tag not in D: D[tag] = [0 for _ in self.col]  # errors in outer scope ><
-        else:
-            for v in D1.itervalues():
-                for tag in range(0, len(v)):
-                    try:
-                        n = ' '.join(v[0][tag-int(self.args['--ngr']):tag])
-                        if n not in D and '\n' not in n: D[n] = [0 for _ in self.col]
-                    except KeyError:
-                        continue
+        # grab all the possible n-gram combinations and list them
+        for k, v in D1.iteritems():
+            for tag in range(0, len(v[0])):
+                try: n = ' '.join(v[0][(tag-int(self.args['--ngr'])):tag])
+                except KeyError: continue
+                if n and n not in D and '\n' not in n: D[n] = [0 for _ in self.col]
 
+        # for each boolean dict, if a certain n-gram range is completely true,
+        # append the counts to the appropriate positional tags
         for K1, V1 in D1.iteritems():
             try:
                 V4 = D4[K1]
-                for i in range(0, len(V4)-1):  # -1 to ignore \n
-                    if not self.args['--ngr']:
-                        if V4[i] and '--cor' in self.col:
-                            D[V1[0][i]][self.col.keys().index('--cor')] += 1
-                        elif '--inc' in self.col:
-                            D[V1[0][i]][self.col.keys().index('--inc')] += 1
-                        if '--tot' in self.col:
-                            D[V1[0][i]][self.col.keys().index('--tot')] += 1
-                    else:
-                        if V4[i-int(self.args['--ngr']):i].count(True) is 2 \
-                            and '--cor' in self.col and self.args['--ngr']:
-                            D[' '.join(V1[0][i-int(self.args['--ngr']):i])][self.col.keys().index('--cor')] += 1
-                        elif '--inc' in self.col:
-                            D[' '.join(V1[0][i-int(self.args['--ngr']):i])][self.col.keys().index('--inc')] += 1
-                        if '--tot' in self.col:
-                            D[' '.join(V1[0][i-int(self.args['--ngr']):i])][self.col.keys().index('--tot')] += 1
-                checkl.append(V4)
             except KeyError as e:
-                # "Estimated volume was a moderate 3.5 million ounces" seems to
-                # error for some reason
-                errs.append(e)
-
-        if self.args['--ngr']:
-            klist = []
-            [klist.append(k) for k in D.iterkeys() if len(k.split(' ')) < int(self.args['--ngr'])]
-            for k in klist:
-                del D[k]
+                errs.append(e)  # "Estimated volume was a moderate 3.5 million ounces" seems to  error for some reason
+            for i in range(0, len(V4)-1 if not self.args['--ngr'] else len(V4)):  # -1 to ignore \n
+                try:  # do not shuffle this stuff around or it will break
+                    if V4[i-int(self.args['--ngr']):i].count(True) is int(self.args['--ngr']) \
+                        and '--cor' in self.col and self.args['--ngr']:
+                        D[' '.join(V1[0][i-int(self.args['--ngr']):i])][self.col.keys().index('--cor')] += 1
+                    elif '--inc' in self.col:
+                        D[' '.join(V1[0][i-int(self.args['--ngr']):i])][self.col.keys().index('--inc')] += 1
+                    if '--tot' in self.col:
+                        D[' '.join(V1[0][i-int(self.args['--ngr']):i])][self.col.keys().index('--tot')] += 1
+                    checkl.append(V4)
+                except KeyError as e:
+                    errs.append(e)  # "Estimated volume was a moderate 3.5 million ounces"
+                                    # seems to  error for some reason
 
         self.logd.update({"Misc Err: ": len(errs),
                           "Total sents GS: ": len(D1),
