@@ -35,4 +35,6 @@ class Logger:
         self.tlog = logging.getLogger('tweakers')
         self.elog = logging.getLogger('core')
         self.llog = logging.getLogger('loader')
+        self.mlog = logging.getLogger('mongo')
+        self.lolog = logging.getLogger('lookup')
         self.halt = False

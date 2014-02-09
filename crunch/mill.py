@@ -40,15 +40,6 @@ class Mill:
         jdoc[prep+'date'] = ' '.join(date)
         return jdoc
 
-    def data_size(self):
-        """ Return the size of the data for confirmation. """
-        return len(self.data)
-
     def sample(self):
         """ Return a sample of the data. """
         return json.dumps(self.data[0], sort_keys=False, indent=4, separators=(',', ': '))
-
-    def count_docs(self, cmt_count, doc):
-        """ Count the amount of populated docs. """
-        cmt_count['Populated Articles'] += 1 if doc['comments'] else 0  # doc
-        return cmt_count

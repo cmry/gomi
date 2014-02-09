@@ -3,44 +3,17 @@
 __author__ = 'chris'
 __version__ = 'Version 06.02'
 
-import core.loader
 import crunch
 from copy import deepcopy
 
 
 class Wrapper:
 
-    def __init__(self, args, log, mongo):
-        """ This module is used to carry out functions
-         within the program, it basically routs command line parameters
-         parsed from the init class to the wrapper module from which it
-         will call the appropriate classes.
+    def __init__(self, glob):
 
-         Just plug stable class dailies in here, don't forget to add self.args
-         to the main class as well. """
 
-        self.args = args
-        self.log = log
-        self.mongo = mongo
+        self.glob = glob
         self.outp = {}
-
-    def route(self):
-        """ The route functions handles the arguments and pipes them to
-        the appropriate functions. """
-
-        if self.args['mongo']:
-            self.route_mongo()
-
-    def route_mongo(self):
-        db, args = self.mongo, self.args
-        if args['load'] and args['-a']:
-            [db.insert_db(x) for x in db.fetch_data(0, True)]
-        elif args['load'] and args['--slice']:
-            [db.insert_db(x) for x in db.fetch_data(int(args['--slice']), True)]
-        elif args['search']:
-            db.grab_row(args['--key'], args['--value'])
-        elif args['del']:
-            db.clear_all(True if args['-x'] else False)
 
 
         # # this part wraps actions that are carried out directly on the
