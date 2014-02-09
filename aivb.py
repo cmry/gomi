@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 __author__ = 'chris'
-__version__ = 'Version 06.02'  # update by date on subclass change
+__version__ = 'Version 09.02'  # update by date on subclass change
 __doc__ = """ AIVB
 
  Usage:
@@ -47,6 +47,10 @@ __doc__ = """ AIVB
 import core
 from docopt import docopt  # install with pip
 
+class Arguments(dict):
+
+    def store(self, args):
+        self.update(args)
 
 class AIVB:
 
@@ -56,8 +60,8 @@ class AIVB:
         be extended if the scraper is also integrated.s """
 
         self.log = core.logger.Logger()
-        self.mongo = core.mongo.Mongo()
-        self.args = core.args.Arguments()
+        self.mongo = core.mongo.Mongo(self.log)
+        self.args = Arguments()
         self.boot()
 
     def boot(self):

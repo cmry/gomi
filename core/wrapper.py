@@ -32,15 +32,15 @@ class Wrapper:
             self.route_mongo()
 
     def route_mongo(self):
-        loader, args = core.loader.Loader(self.log), self.args
+        db, args = self.mongo, self.args
         if args['load'] and args['-a']:
-            [self.mongo.insert_db(x) for x in loader.fetch_data(0, True)]
+            [db.insert_db(x) for x in db.fetch_data(0, True)]
         elif args['load'] and args['--slice']:
-            [self.mongo.insert_db(x) for x in loader.fetch_data(int(args['--slice']), True)]
+            [db.insert_db(x) for x in db.fetch_data(int(args['--slice']), True)]
         elif args['search']:
-            self.mongo.grab_row(args['--key'], args['--value'])
+            db.grab_row(args['--key'], args['--value'])
         elif args['del']:
-            self.mongo.clear_all(True if self.args['-x'] else False)
+            db.clear_all(True if args['-x'] else False)
 
 
         # # this part wraps actions that are carried out directly on the
