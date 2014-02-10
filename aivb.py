@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 
 __author__ = 'chris'
-__version__ = 'Version 09.02'  # update by date on subclass change
+__version__ = 'Version 10.02'  # update by date on subclass change
 __doc__ = """ AIVB
 
  Usage:
     aivb mongo load [-a] [--slice=N]
     aivb mongo search [--key=k] [--value=v]
     aivb mongo del [-x]
-    aivb lookup [-lem]
+    aivb lookup [-lemc]
+    aivb grapher -d
     aivb (-h | --help)
     aivb (-q | --quit)
     aivb --version
@@ -17,6 +18,7 @@ __doc__ = """ AIVB
     mongo               used to interface with MongoDB (loading, unloading, etc.)
     lookup              this executes commands to directly display data info
     crunch              this is the evaluation module for the scraped articles
+    grapher             is used to display statistics in a nice graph
 
  Mongo:
     load                insert an N amount of articles
@@ -35,6 +37,10 @@ __doc__ = """ AIVB
     -l                  get the length of the total dataset
     -e                  get the amount of existing comments
     -m                  get the amount of missing comments
+    -c                  get the total amount of comments
+
+ Grapher:
+    -d, --dates         export the date graph for both sources in dataset
 
  Misc:
     -h, --help          show this help message and exit
@@ -45,6 +51,7 @@ __doc__ = """ AIVB
 
 from core.mongo import Mongo, Lookup
 from core.logger import Logger
+from crunch.grapher import Grapher
 from docopt import docopt  # install with pip
 
 class AIVB:
@@ -73,8 +80,9 @@ class AIVB:
         if self.args['mongo']:
             self.__route_mongo()
         elif self.args['lookup']:
-            self.__route_lookup()
-
+            self.__route_mod(Lookup(self.log))
+        elif self.args['grapher']:
+            self.__route_mod(Grapher(self.log))
 
     def __route_mongo(self):
         args, db = self.args, Mongo(self.log)
@@ -83,14 +91,13 @@ class AIVB:
         elif args['load'] and args['--slice']:
             db.load(int(args['--slice']))
         elif args['search']:
-            print "Output: %s" % [x for x in db.search(args['--key'], args['--value'])]
+            print "Output: %s" % [x for x in db.search('search', args['--key'], args['--value'])]
         elif args['del']:
             db.clear_all(True if args['-x'] else False)
 
-    def __route_lookup(self):
-        args, db = self.args, Lookup(self.log)
-        db.route_args(args)
-        print(db)
+    def __route_mod(self, mod):
+        mod.route_args(self.args)
+        print(mod)
 
 
 if __name__ == '__main__':

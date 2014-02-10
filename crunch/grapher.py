@@ -1,16 +1,20 @@
 __author__ = 'chris'
 
 import pygal
+from core.mongo import Mongo
 from collections import OrderedDict
 
 
-class Grapher:
+class Grapher(Mongo):
 
-    def __init__(self):
-        pass
+    def route_args(self, args):
+        if args['--dates']:
+            self.date_chart()
 
-    def comm_chart(self, dict):
-        print dict
+    def date_chart(self):
+
+        comment = [x for x in self.articles.search('exists', 'comment_date')]
+
         #comment = dict['Comment_dates']
         #article = dict['Article_dates']
         #comment = OrderedDict(sorted(comment.items(), key=lambda (k, v): v, reverse=True))
