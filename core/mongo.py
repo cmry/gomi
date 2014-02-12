@@ -139,24 +139,28 @@ class Loader(Mongo):
         doc['cmt_count'] = local_count
         yield doc
 
-    def __parse_date(self, jdoc, prep=str()):
+    def __parse_date(self, jdoc, prep=''):
         """ Preprocess datestamps into date format. """
-        date = [x.lower() for x in jdoc[prep+'date'].split()]
+        date, brk = [x.lower() for x in jdoc[prep+'date'].split()], False
         try:
             int(date[0])
         except ValueError:
             date = [x for x in reversed(date)]
-        try:
-            jdoc[prep+'date'] = datetime(*strptime(str(int(date[0])) + " " + self.__parse_month(date[1]) + " " +
-                                                   jdoc[prep+'year'] + " " + jdoc[prep+'time'], '%d %m %Y %H:%M')[:6])
         except IndexError:
-            jdoc[prep+'date'] = 'UNK'
+            jdoc[prep+'date'] = datetime(*strptime('1 3 1937 13:37', '%d %m %Y %H:%M')[:6]); brk = True
+        if not brk:
+            try:
+                jdoc[prep+'date'] = datetime(*strptime(str(int(date[0])) + " " + self.__parse_month(date[1]) + " " +
+                                                       jdoc[prep+'year'] + " " + jdoc[prep+'time'], '%d %m %Y %H:%M')[:6])
+            except IndexError:
+                jdoc[prep+'date'] = datetime(*strptime('1 3 1937 13:37', '%d %m %Y %H:%M')[:6])
 
         del jdoc[prep+'year']; del jdoc[prep+'time']; return jdoc
 
     def __parse_month(self, date):
         datel = {
             'januari':      '1',
+            'january':      '1',
             'februari':     '2',
             'maart':        '3',
             'april':        '4',
