@@ -5,7 +5,7 @@ __author__ = 'chris'
 
 from re import compile
 
-from scraper.article import *
+from article import *
 
 
 class TwkScraper:
@@ -42,7 +42,7 @@ class TwkScraper:
     def fetch_date(self, date):
         """ Splits our date into seperate fields for storage (re-usable). """
         #this isn't re-usable
-        date = self.fetch_tagcont(date.find('span'))
+        date = self.fetch_tagcont(date.find("span", {"itemprop": "datePublished"}))
         datel = date.split(' ')
 
         self.art.date = str(datel[1]+' '+datel[2])
@@ -73,7 +73,11 @@ class TwkScraper:
     def fetch_subj(self, subjfield):
         """ Grabs subjects from subject field. Sometimes
         not present, catch error. """
-        subj = subjfield.find("div", {"class": "rbEntitylist"})
+
+        try:
+            subj = subjfield.find("div", {"class": "rbEntitylist"})
+        except AttributeError:
+            subj = ''
 
         subjl = []
         try:
@@ -86,7 +90,10 @@ class TwkScraper:
 
     def fetch_comm(self, comments):
         """ Grabs id, score, date and text from comments. """
-        comments = comments.find("div", {"id": "reacties"})
+        try:
+            comments = comments.find("div", {"id": "reacties"})
+        except AttributeError:
+            comments = []
 
         for comment in comments.findAll("div", {"class": "reactie"}):
             self.art.comment['comment_id'] = comment['id']
@@ -121,7 +128,7 @@ class TwkScraper:
                     self.art.comment['comment_time'] = str(datel[3])
                     datel = []
         except (AttributeError, IndexError) as e:
-            self.log.tlog.warning("Error "+str(e)+" occurred in current article.")
+            self.log.tlog.critical("Error "+str(e)+" occurred in "+str(self.target))
             pass
 
     def fetch_commt(self, text):

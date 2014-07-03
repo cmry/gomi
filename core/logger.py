@@ -2,9 +2,11 @@
 # -*- coding: utf-8 -*-
 
 __author__ = 'chris'
+__version__ = 'Version 26.06'
 
 import logging
 import os
+from crunch.compresser import Compresser
 
 class Logger:
 
@@ -30,6 +32,7 @@ class Logger:
         console.setFormatter(formatter)
         logging.getLogger('').addHandler(console)
 
+        self.alog = logging.getLogger('atom')
         self.rlog = logging.getLogger('scraper')
         self.nlog = logging.getLogger('nu.nl')
         self.tlog = logging.getLogger('tweakers')
@@ -37,4 +40,14 @@ class Logger:
         self.llog = logging.getLogger('loader')
         self.mlog = logging.getLogger('mongo')
         self.lolog = logging.getLogger('lookup')
-        self.halt = False
+        self.plog = logging.getLogger('preprocesser')
+        self.glog = logging.getLogger('grapher')
+
+    def route_args(self, args):
+        if args['--del']:
+            ana = Compresser('n', 'tot')
+            d = ana.hit_ph()
+            dr = ana.sort_date(ana.bind_clusters(d))
+
+            for k, v in dr.iteritems():
+                yield k, ' '*(len('Tue May 13 14:46')+5-len(k)), v

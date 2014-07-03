@@ -5,12 +5,12 @@ __author__ = 'chris'
 
 import socket
 from urllib2 import *
-from re import compile
+from re import compile, sub
 from time import sleep, strptime
 
 from bs4 import BeautifulSoup
 
-from scraper.article import *
+from article import *
 
 
 class NuScraper:
@@ -40,8 +40,12 @@ class NuScraper:
 
     def fetch_cont(self, article):
         """ Grabs the date and text fields. """
-        field = article.find("div", {"class": "dateplace-data"})
-        self.fetch_date(self.fetch_tagcont(field))
+        try:
+            field = article.find("div", {"class": "dateplace-data"})
+            self.fetch_date(self.fetch_tagcont(field))
+        except AttributeError:  # fix for older atricles
+            field = article.find("div", {"class": "dateplace clearfix"})
+            self.fetch_date(sub('   *|[^A-Za-z0-9: ]', '', self.fetch_tagcont(field.find("span"))).split('update:')[1])
         field = article.find("div", {"class": "content"})
         self.fetch_text(field)
 
@@ -140,64 +144,61 @@ class NuScraper:
 
         try:
             pages = comments.find("div", {"class": "pages"})
+        except AttributeError:
+            self.log.nlog.critical("No comments found!")
+            return
 
-            link_list, comment_list = [], []
-            comment_list.append(comments)
+        link_list, comment_list = [], []
+        comment_list.append(comments)
 
-            for link in set(pages.findAll('a')):
-                link_list.append(link['href'])
+        for link in set(pages.findAll('a')):
+            link_list.append(link['href'])
 
-            if link_list:
-                for href in set(link_list):
-                    try:
-                        page = urlopen('http://www.nujij.nl'+href)
-                        nu_soup = BeautifulSoup(page)
-                        comment_list.append(nu_soup.find("div", {"class": "bericht-subsectie"}))
-                    except (HTTPError, socket.error, URLError) as e:
-                        if e.reason[0] is 104 or 'URLError' in e:
-                            self.log.nlog.warning("Connection reset by peer. Trying again.")
-                            time.sleep(5)
-                            self.fetch_comm(comments)
-                        else:
-                            #if url doesn't exist or is blocked
-                            self.log.nlog.error(str(e)+': NuJij not found for: '+href)
+        if link_list:
+            for href in set(link_list):
+                try:
+                    page = urlopen('http://www.nujij.nl'+href)
+                    nu_soup = BeautifulSoup(page)
+                    comment_list.append(nu_soup.find("div", {"class": "bericht-subsectie"}))
+                except (HTTPError, socket.error, URLError) as e:
+                    if e.reason[0] is 104 or 'URLError' in e:
+                        self.log.nlog.warning("Connection reset by peer. Trying again.")
+                        time.sleep(5)
+                        self.fetch_comm(comments)
+                    else:
+                        #if url doesn't exist or is blocked
+                        self.log.nlog.error(str(e)+': NuJij not found for: '+href)
 
-            for comment_section in comment_list:
-                for comment in comment_section.find("ol", {"class": "reacties"}).findAll("li"):
-                    try:
-                        self.art.comment['comment_id'] = comment['id']
-                        self.fetch_commh(comment)
+        for comment_section in comment_list:
+            for comment in comment_section.find("ol", {"class": "reacties"}).findAll("li"):
+                try:
+                    self.art.comment['comment_id'] = comment['id']
+                    self.fetch_commh(comment)
 
-                        text = self.fetch_tagcont(comment.find("div", {"class": "reactie-body"}))
-                        self.fetch_commt(text)
+                    text = self.fetch_tagcont(comment.find("div", {"class": "reactie-body"}))
+                    self.fetch_commt(text)
 
-                        self.art.comments.append(self.art.comment)
-                        self.art.comment = {'comment_id': '',
-                                            'comment_user': '',
-                                            'comment_date': '',
-                                            'comment_year': '',
-                                            'comment_time': '',
-                                            'comment_text': '',
-                                            'comment_vote': ''}
-                    except KeyError:
-                        pass
-
-        except (AttributeError, TypeError) as e:
-            self.log.nlog.error(str(e)+': something fucked up.')
-            pass
+                    self.art.comments.append(self.art.comment)
+                    self.art.comment = {'comment_id': '',
+                                        'comment_user': '',
+                                        'comment_date': '',
+                                        'comment_year': '',
+                                        'comment_time': '',
+                                        'comment_text': '',
+                                        'comment_vote': ''}
+                except (KeyError, AttributeError, TypeError):
+                    # putting shit here will spam big time
+                    continue
 
     def fetch_commh(self, header):
         """ Picks required a's in the header object to parse date. """
-        try:
-            self.art.comment['comment_vote'] = " ".join(self.fetch_tagcont(x)
-                                                        for x in header.findAll("div", {"class": "reactie-saldo"}))
-            self.art.comment['comment_user'] = self.fetch_tagcont(header.find("strong"))
-            datel = header.find("span", {"class": "tijdsverschil"})['publicationdate'].split(' ')
-            self.art.comment['comment_date'] = str(datel[0]+' '+datel[1][:-1])
-            self.art.comment['comment_year'] = str(datel[2])
-            self.art.comment['comment_time'] = str(datel[3][:-3])
-        except (TypeError, AttributeError) as e:
-            self.log.nlog.error(str(e)+': error while processing comments.')
+        self.art.comment['comment_vote'] = " ".join(self.fetch_tagcont(x)
+                                                    for x in header.findAll("div", {"class": "reactie-saldo"}))
+        self.art.comment['comment_user'] = self.fetch_tagcont(header.find("strong"))
+        datel = header.find("span", {"class": "tijdsverschil"})['publicationdate'].split(' ')
+        self.art.comment['comment_date'] = str(datel[0]+' '+datel[1][:-1])
+        self.art.comment['comment_year'] = str(datel[2])
+        self.art.comment['comment_time'] = str(datel[3][:-3])
 
     def fetch_commt(self, text):
         """ Parses the comment text. """
@@ -249,7 +250,7 @@ class NuScraper:
                 if tries < 30:
                     self.fetch_nujij(soup, tries)
                 else:
-                    self.log.nlog.critical(str(e)+' mobile site permanently refused.')
+                    self.log.nlog.critical(str(e)+' mobile site permanently refused for: http://m.nu.nl/'+str(backlink))
                     self.log.halt = True
                 page = None
 
