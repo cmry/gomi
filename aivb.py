@@ -13,6 +13,7 @@ __doc__ = """ AIVB
     aivb prep [z] label [(--dater=dr | --subjr=sr | --perir)]
     aivb prep [z] dump [--switch=sw] [--outp=op] [--split]
     aivb grapher [z] [-c] (--dates | --topics) [--style=s] [(--months | --years)] [--range=r]
+    aivb classifier [--kf=kf] --train=tr --test=te --mem=mem --mod=ml
     aivb logger --comp
     aivb (-h | --help)
     aivb (-q | --quit)
@@ -24,7 +25,9 @@ __doc__ = """ AIVB
     lookup              this executes commands to directly display data info
     prep                used to preprocess the existing db entries
     grapher             is used to display statistics in a nice graph
-    logger              operates on the logs
+    classifier          the classifier implements tenfold cross-validation and a
+                        bootstrap for the Stanford Topic Modelling Toolbox (STMT)
+    logger              operates on the dumped dataset from preprocessing
     z                   z reduces the dataset to predefined ranges stated in
                         the preprocessing module, requires split
 
@@ -89,6 +92,15 @@ __doc__ = """ AIVB
     --months            split sources on months
     --range=r           from a certain date range (year-month)st
 
+ Classifier:
+    --kf=kf             if train and test are equal sets, loops k
+                        slices as training set, default is ten
+    --train=tr          input the set you want to train on
+    --test=te           input the set you want to test on
+    --mem=mem           amount of used memory (1000 or 8000 f.e.)
+    --mod=ml            desired model to run, lda or llda, should
+                        be same name as the scala scripts to run STMT
+
  Logger:
     --comp              compresses the log in one file
 
@@ -104,6 +116,7 @@ from core.mongo import Mongo, Lookup
 from core.logger import Logger
 from crunch.grapher import Grapher
 from crunch.preprocesser import Preprocess
+from crunch.classifier import Classifier
 from docopt import docopt  # install with pip
 
 
@@ -142,6 +155,8 @@ class AIVB:
             self.__route_mod(Preprocess(self.log, sw))
         elif self.args['grapher']:
             self.__route_mod(Grapher(self.log, sw))
+        elif self.args['classifier']:
+            self.__route_mod(Classifier(self.log))
         elif self.args['logger']:
             self.__route_mod(Logger())
 
