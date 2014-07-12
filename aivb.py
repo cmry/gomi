@@ -77,9 +77,8 @@ __doc__ = """ AIVB
                         it falls in the PSP, SP, or OSP (thesis specific).
 
     dump                for moving stuff around
-    --switch=sw         sw can be either True to include 1 topic ouput,
-                        creating a purely Bayesian machinery, with True
-                        it is more usefull for topic models.
+    --switch=sw         sw can be used to split the set on nu.nl and
+                        tweakers.net before inputted into the topic model
     --outp=op           op can be either 'comment' or 'article'
     --split             reduces the dataset to allow z
 
@@ -97,6 +96,7 @@ __doc__ = """ AIVB
                         slices as training set, default is ten
     --train=tr          input the set you want to train on
     --test=te           input the set you want to test on
+    --source=sr         input source, all, tweakers.net, or nu.nl
     --mem=mem           amount of used memory (1000 or 8000 f.e.)
     --mod=ml            desired model to run, lda or llda, should
                         be same name as the scala scripts to run STMT

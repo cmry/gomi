@@ -44,7 +44,7 @@ class Trainer(Classifier):
         """
 
         self.log.trlog.info("Starting training...")
-        self.prep = args['--train']
+        self.prep = args['--train']+'_'+args['--source']
         stmt = STMT(self.log, self.prep, self.dir)
 
         if func == 'kf':

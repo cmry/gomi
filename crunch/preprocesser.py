@@ -77,15 +77,13 @@ class Preprocess(Mongo):
         art_l = [x for x in self.search('select_exists', prep+'date', None, 1, prep+'date')]
 
         for i in range(0, len(art_l)):
-            label = [k for k in perd.iterkeys()
-                    if art_l[i][prep+'date'] >= perd[k][0]
-                    or art_l[i][prep+'date'] <= perd[k][1]
-                    ][0]
+            label = [k for k in perd.iterkeys() if perd[k][0] >= art_l[i][prep+'date'] <= perd[k][1]][0]
             self.update('one', art_l[i]['_id'], 'period_label', label)
 
     def label_period(self):
         t1 = datetime.now()
-        perd = {'ESP': [datetime(2013, 01, 01), datetime(2013, 06, 30)],
+        perd = {'NaP': [datetime(1900, 01, 01), datetime(2012, 12, 31)],
+                'ESP': [datetime(2013, 01, 01), datetime(2013, 06, 30)],
                 'SP':  [datetime(2013, 07, 01), datetime(2013, 12, 31)],
                 'OSP': [datetime(2014, 01, 01), datetime(2014, 06, 30)]
                 }
@@ -93,27 +91,36 @@ class Preprocess(Mongo):
         self.timer(t1, 'periods')
 
     def dump_db(self, args):
-        prep, index = args['--outp'] if args['--outp'] == 'comment_' else '', 0
+
+        prep = args['--outp']+'_' if args['--outp'] == 'comment' else ''
         out_cursor = self.search('grt_eq', prep+'date', None, 'date_range', True)
+
+        if not args['--switch']:
+            args['--switch'] = 'nu.nl tweakers.net'
+            pop = 'all'
+        else:
+            pop = args['--switch'].split('.')[0]
+
         chdir(getcwd()+'/outp')
-        with open(args['--outp']+'_ti.csv', 'wb') as fp:
+        with open(args['--outp']+'_'+pop+'_ti.csv', 'wb') as fp:
             cw = writer(fp, delimiter=',', quotechar='"')
-            data = []
-            for i in out_cursor:
-                index += 1
-                if i['subject_range']:
-                    tags = ' '.join([x.replace(' ', '_') for x in i['subject_range'].split(', ')])
-                    try:
-                        title = self.sanitize(i['content']['title'])
-                    except IndexError:
-                        title = ''
-                    if 'intro' not in i['content']:
-                        text = self.sanitize(i['content']['text'])
-                    else:
-                        text = self.sanitize(i['content']['intro'] + ' ' + i['content']['text'])
-                    data.append([index]+[x.encode("utf-8") for x in [tags, title, title + '. ' + text]])
-            cw.writerows(data)
+            cw.writerows(self.extract_data(out_cursor, prep, args['--switch']))
         chdir(getcwd()+'/../crunch')
+
+    def extract_data(self, d, prep, sw, data=list(), i=0):
+        for x in d:
+            _id, source, date, per = x['_id'], x[prep+'source'], x[prep+'date'], x['period_label']
+            if x['subject_range'] and source in sw:
+                i += 1                                          # hotfix for double topics
+                tags = ' '.join([y.replace(' ', '_') for y in list(set(x['subject_range'].split(', ')))])
+                try:
+                    title = self.sanitize(x['content']['title'])
+                    text = self.sanitize(x['content']['text'] if 'intro' not in x['content'] else x['content']['intro'] + ' ' + x['content']['text'])
+                except IndexError:
+                    title = self.sanitize(x[prep+'title'])
+                    text = self.sanitize(x[prep+'text'])
+                data.append([str(i), source, date, per]+[x.encode("utf-8") for x in [tags, title, title + '. ' + text]])
+        return data
 
     def split(self):
         newc = Connection().aivb_redux.dater
