@@ -77,16 +77,19 @@ class Preprocess(Mongo):
         art_l = [x for x in self.search('select_exists', prep+'date', None, 1, prep+'date')]
 
         for i in range(0, len(art_l)):
-            label = [k for k in perd.iterkeys() if perd[k][0] >= art_l[i][prep+'date'] <= perd[k][1]][0]
+            for k in perd.iterkeys():
+                if perd[k][0] <= art_l[i][prep+'date'] <= perd[k][1]:
+                    label = k
+                    break
+                else:
+                    label = 'NaP'
             self.update('one', art_l[i]['_id'], 'period_label', label)
 
     def label_period(self):
         t1 = datetime.now()
-        perd = {'NaP': [datetime(1900, 01, 01), datetime(2012, 12, 31)],
-                'ESP': [datetime(2013, 01, 01), datetime(2013, 06, 30)],
+        perd = {'ESP': [datetime(2013, 01, 01), datetime(2013, 06, 30)],
                 'SP':  [datetime(2013, 07, 01), datetime(2013, 12, 31)],
-                'OSP': [datetime(2014, 01, 01), datetime(2014, 06, 30)]
-                }
+                'OSP': [datetime(2014, 01, 01), datetime(2014, 06, 30)]}
         [self.update_period(perd, i) for i in ['', 'comment_']]
         self.timer(t1, 'periods')
 
@@ -115,11 +118,11 @@ class Preprocess(Mongo):
                 tags = ' '.join([y.replace(' ', '_') for y in list(set(x['subject_range'].split(', ')))])
                 try:
                     title = self.sanitize(x['content']['title'])
-                    text = self.sanitize(x['content']['text'] if 'intro' not in x['content'] else x['content']['intro'] + ' ' + x['content']['text'])
-                except IndexError:
+                    text = title + '. ' + self.sanitize(x['content']['text'] if 'intro' not in x['content'] else x['content']['intro'] + ' ' + x['content']['text'])
+                except KeyError:
                     title = self.sanitize(x[prep+'title'])
                     text = self.sanitize(x[prep+'text'])
-                data.append([str(i), source, date, per]+[x.encode("utf-8") for x in [tags, title, title + '. ' + text]])
+                data.append([str(i), _id, source, date, per]+[x.encode("utf-8") for x in [tags, title, text]])
         return data
 
     def split(self):

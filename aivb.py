@@ -80,7 +80,7 @@ __doc__ = """ AIVB
     --switch=sw         sw can be used to split the set on nu.nl and
                         tweakers.net before inputted into the topic model
     --outp=op           op can be either 'comment' or 'article'
-    --split             reduces the dataset to allow z
+    --split             reduces the dataset to allow z interaction
 
  Grapher:
     -c, --comments      include comments
@@ -115,7 +115,7 @@ from scraper.scraper import Scraper
 from core.mongo import Mongo, Lookup
 from core.logger import Logger
 from crunch.grapher import Grapher
-from crunch.preprocesser import Preprocess
+from crunch.preprocessor import Preprocess
 from crunch.classifier import Classifier
 from docopt import docopt  # install with pip
 
