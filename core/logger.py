@@ -43,8 +43,6 @@ class Logger:
         self.glog = logging.getLogger('grapher')
         self.clog = logging.getLogger('classifier')
         self.slog = logging.getLogger('STMT')
-        self.trlog = logging.getLogger('trainer')
-        self.telog = logging.getLogger('tester')
         self.lolog = logging.getLogger('lookup')
 
     def route_args(self, args):

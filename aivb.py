@@ -13,7 +13,7 @@ __doc__ = """ AIVB
     aivb prep [z] label [(--dater=dr | --subjr=sr | --perir)]
     aivb prep [z] dump [--switch=sw] [--outp=op] [--split]
     aivb grapher [z] [-c] (--dates | --topics) [--style=s] [(--months | --years)] [--range=r]
-    aivb classifier [--kf=kf] --train=tr --test=te --mem=mem --mod=ml
+    aivb classifier [--kf=kf] --source=sc --train=tr --test=te --mem=mem --mod=ml
     aivb logger --comp
     aivb (-h | --help)
     aivb (-q | --quit)

@@ -78,11 +78,9 @@ class Preprocess(Mongo):
 
         for i in range(0, len(art_l)):
             for k in perd.iterkeys():
+                label = 'NaP'
                 if perd[k][0] <= art_l[i][prep+'date'] <= perd[k][1]:
-                    label = k
-                    break
-                else:
-                    label = 'NaP'
+                    label = k; break
             self.update('one', art_l[i]['_id'], 'period_label', label)
 
     def label_period(self):
