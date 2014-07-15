@@ -81,6 +81,7 @@ class Classifier:
         for key in new_m.iterkeys():
             m[key] = new_m[key] if key not in m else (m[key] + new_m[key])
             if k:
+                print "ERE"
                 m[key] = m[key] / k
         return m
 
