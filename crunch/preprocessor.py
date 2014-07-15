@@ -111,7 +111,7 @@ class Preprocess(Mongo):
     def extract_data(self, d, prep, sw, data=list(), i=0):
         for x in d:
             _id, source, date, per = x['_id'], x[prep+'source'], x[prep+'date'], x['period_label']
-            if x['subject_range'] and source in sw:
+            if x['subject_range'] and source in sw and x['']:
                 i += 1                                          # hotfix for double topics
                 tags = ' '.join([y.replace(' ', '_') for y in list(set(x['subject_range'].split(', ')))])
                 try:
