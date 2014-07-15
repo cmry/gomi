@@ -4,6 +4,7 @@ __version__ = '09.07'
 import csv
 from re import sub
 from random import shuffle
+from collections import OrderedDict
 
 def regex_replace(f, needle, rock):
     with open(f, 'r') as rf:
@@ -26,3 +27,9 @@ def slice_list(l, k):
         j = i + len(l[x::k])
         yield l[i:j]
         i = j
+
+def sortd(d, s, r):
+    if s == 'k':
+        return OrderedDict(sorted(d.items(), key=lambda k: k, reverse=r))
+    elif s == 'v':
+        return OrderedDict(sorted(d.items(), key=lambda (k, v): v, reverse=r))

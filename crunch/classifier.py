@@ -6,8 +6,9 @@ __version__ = 'Version 04.07'
 from core.util import *
 import csv
 from copy import deepcopy
-from os.path import isfile, isdir
+from glob import glob
 from os import getcwd
+from os.path import isfile, isdir
 from subprocess import call
 
 
@@ -20,14 +21,11 @@ class Classifier:
         self.prep = None
 
     def route_args(self, args):
-        if args['--train'] == args['--test']:
-            self.__dispatch(args, 'train', 'kf')
-            self.__dispatch(args, 'test', 'kf')
-            self.__dispatch(args, 'evaluat', 'kf')
-        else:
-            self.__dispatch(args, 'train', 'tt')
-            self.__dispatch(args, 'test', 'tt')
-            self.__dispatch(args, 'evaluat', 'tt')
+        func = 'kf' if args['--train'] == args['--test'] else 'tt'
+        if not args['skip']:
+            self.__dispatch(args, 'train', func)
+            self.__dispatch(args, 'test', func)
+        self.__dispatch(args, 'evaluat', func)
 
     def __dispatch(self, args, sw, func):
         """
@@ -39,37 +37,94 @@ class Classifier:
 
         self.log.clog.info("Starting "+sw+"ing...")
         self.prep = args['--train']+'_'+args['--source']
+        k = 10 if not args['--kf'] else int(args['--kf'])
 
         if sw != 'evaluat':
             stmt = STMT(self.log, self.prep, self.dir)
             args['--mod'] = sw if sw == 'test' else args['--mod']
 
             if func == 'kf':
-                k = 10 if not args['--kf'] else int(args['--kf'])
-                self.kfold(k) if sw == 'train' else None
+                self.__kfold(k) if sw == 'train' else None
                 stmt.kfold(k, args['--mod'], args['--mem'])
             elif func == 'tt':
                 stmt.route(args['--train'], args['--mod'], args['--mem'])
         else:
-            pass
+            if func == 'kf':
+                for k in range(k):
+                    self.__evaluate(self.dir+self.prep+'_'+str(k)+'_fold'+'_'+args['--mod'])
+            elif func == 'tt':
+                self.__evaluate(self.dir+self.prep+'_'+args['--mod'])
 
-    def kfold(self, k):
+    def __kfold(self, k):
         if isfile(self.dir+self.prep+'_'+str(k-1)+'_fold'+'_train.csv'):
             self.log.clog.warn("Folds already exist!")
         else:
-            m = [x for x in slice_list(csv_to_matrix(self.dir+self.prep+'_ti.csv'), k)]
+            m = [x for x in slice_list(csv_to_matrix(self.dir+self.prep+'_ti.csv', 'shuffle'), k)]
             for i in xrange(len(m)):
                 self.__write_folds(m, i)
             self.log.clog.info(str(k)+" folds have been written.")
 
     def __write_folds(self, m, k):
-        test = deepcopy(m)
-        train = [test.pop(k)]
+        train = deepcopy(m)
+        test = [train.pop(k)]
         assert len(train) < len(m)
         with open(self.dir+self.prep+'_'+str(k)+'_fold'+'_train.csv', 'w') as fp:
             csv.writer(fp, delimiter=',', quotechar='"').writerows([x for i in train for x in i])
         with open(self.dir+self.prep+'_'+str(k)+'_fold'+'_test.csv', 'w') as fp:
             csv.writer(fp, delimiter=',', quotechar='"').writerows([x for i in test for x in i])
+
+    def __evaluate(self, res_dir):
+        label_index = self.get_labi(res_dir)
+        d = self.filter_topid(res_dir, label_index)
+        r = self.get_reflab(res_dir)
+        p1, p5, pk = self.ref_comp(d, r, label_index)
+        self.log.clog.info("\n Precision at 1: \t " + str(p1) + "\n Precision at 5: \t " + str(p5) + "\n Precision at k: \t " + str(pk))
+
+    def ref_comp(self, d, r, li):
+        cong = [[0 for _ in li] for _ in li]
+        p1, p5, pk = 0.0, 0.0, 0.0
+        for key in d.iterkeys():
+            gs, temp_p5, temp_pk = r[key].split(), 0.0, 0.0
+            k = len(gs)
+            for i in xrange(k if k > 5 else 5):
+                if list(d[key])[i] in gs:
+                    if i <= 0:
+                        p1 += 1.0
+                    if i <= 5-1:
+                        temp_p5 += 1.0
+                    if i <= k-1:
+                        temp_pk += 1.0
+            p5 += (temp_p5/float(len(gs) if len(gs) < 5 else 5))
+            pk += (temp_pk/float(len(gs)))
+        return p1/len(d), p5/len(d), pk/len(d)
+
+    def get_reflab(self, res_dir, li=list()):
+        ref = glob(res_dir+'/*distributions-res.csv')[0].split('-')[0].split('/')
+        ref = ref[len(ref)-1]+'.csv'
+        r = {}
+        with open(res_dir+'/../'+ref) as f:
+            cf = csv.reader(f, delimiter=',', quotechar='"')
+            for line in cf:
+                index, topics = line[0], line[5]
+                r[index] = topics
+        return r
+
+    def get_labi(self, res_dir, li=list()):
+        with open(res_dir+'/01000/label-index.txt', 'r') as f:
+            for i in f.readlines():
+                li.append(i.strip('\n'))
+        return li
+
+    def filter_topid(self, res_dir, li):
+        d = csv_to_matrix(glob(res_dir+'/*distributions-res.csv')[0])
+        m = {}
+        for i in xrange(len(d)):
+            sort_d = {}
+            for j in xrange(len(d[i])):
+                #if 0.1 <= float(d[i][j]) <= 1:  # big assumption here
+                sort_d[li[j-1]] = float(d[i][j])
+            m[d[i][0]] = sortd(sort_d, 'v', True)
+        return m
 
 
 class STMT:
