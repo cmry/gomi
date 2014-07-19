@@ -5,7 +5,6 @@ __version__ = 'Version 20.06'
 
 from core.mongo import Mongo
 from core.mapper import TF
-from heapq import merge
 from collections import OrderedDict
 from pandas import *
 import pygal
@@ -118,5 +117,14 @@ class Grapher(Mongo):
 
         df = DataFrame([v[1] for v in d], index=['' for i in range(0, len(d))], columns=list('t'))
         plt.figure(); df.plot(logy=True, logx=True); plt.show()
+
+        print "Graph sucessfully created!"
+
+    @staticmethod
+    def convergence_plot(l):
+
+        matplotlib.rcParams['axes.unicode_minus'] = False
+        df = DataFrame([[li] for li in l], index=['' for i in range(0, len(l))])
+        plt.figure(); df.plot(); plt.show()
 
         print "Graph sucessfully created!"

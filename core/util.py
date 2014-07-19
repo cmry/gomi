@@ -6,6 +6,7 @@ from re import sub
 from random import shuffle
 from collections import OrderedDict
 
+
 def regex_replace(f, needle, rock):
     with open(f, 'r') as rf:
         stack = sub(needle, rock, rf.read())
@@ -21,12 +22,20 @@ def csv_to_matrix(csvf, shuf=False):
         return m
 
 
+def gen_csv(csvf):
+    with open(csvf, 'r') as f:
+        cf = csv.reader(f)
+        for row in cf:
+            yield row
+
+
 def slice_list(l, k):
     i = 0
     for x in xrange(k):
         j = i + len(l[x::k])
         yield l[i:j]
         i = j
+
 
 def sortd(d, s, r):
     if s == 'k':
