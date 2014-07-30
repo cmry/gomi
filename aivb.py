@@ -13,7 +13,8 @@ __doc__ = """ AIVB
     aivb prep [z] label [(--dater=dr | --subjr=sr | --perir)]
     aivb prep [z] dump [--switch=sw] [--outp=op] [--split]
     aivb grapher [z] [-c] (--dates | --topics) [--style=s] [(--months | --years)] [--range=r]
-    aivb classifier [(skip | flush)] [--kf=kf] --source=sc --train=tr --test=te --mem=mem --mod=ml
+    aivb classifier [(eval | flush | dater)] [--kf=kf] --source=sc --train=tr --test=te [--mem=mem] --mod=ml
+    aivb dater --inp=inp
     aivb logger --comp
     aivb (-h | --help)
     aivb (-q | --quit)
@@ -92,8 +93,9 @@ __doc__ = """ AIVB
     --range=r           from a certain date range (year-month)st
 
  Classifier:
-    skip                skips training and testing, just displays results
+    eval                skips training and testing, just evaluate
     flush               removes all current stuff except for datasets
+    dater               dump the current config to final dataset
     --kf=kf             if train and test are equal sets, loops k
                         slices as training set, default is ten
     --train=tr          input the set you want to train on

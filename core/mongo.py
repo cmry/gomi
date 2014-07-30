@@ -24,6 +24,23 @@ class Mongo(object):
         self.articles = Connection().aivb_db.articles \
             if not sw else Connection().aivb_redux.dater
 
+    def __str__(self):
+        return """
+                'all':        None,
+                'search':     {k: v},
+                'empty':      {k: 0},
+                'filled':     {k: {'$gt': 0.5}},
+                'gtv':        {k: {'$gt': v}},
+                'regex':      {k: {'$regex': v}},
+                'exists':     {k: {'$exists': True}},
+                'and_ex':     {'$and': [{k: v}, {k2: {'$exists': True}}]},
+                'grt_ex':     {'$and': [{k: {'$exists': True}}, {k2: {'$gt': v2}}]},
+                'grt_eq':     {'$and': [{k: {'$exists': True}}, {k2: v2}]},
+                'p_range':    {'$and': [{k: {'$gte': v}}, {k2: {'$lte': v2}}]},
+                'period':     {'$and': [{k: v}, {k2: {'$gt': v2}}]},
+                'andand':     {'$and': [{k: v}, {k2: v2}]}
+                """
+
     def load(self, n=None):
         load = Loader(self.log)
         data = load.fetch_data(n)

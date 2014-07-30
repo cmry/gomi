@@ -37,8 +37,10 @@ def slice_list(l, k):
         i = j
 
 
-def sortd(d, s, r):
+def sortd(d, s, r, i=None):
     if s == 'k':
         return OrderedDict(sorted(d.items(), key=lambda k: k, reverse=r))
     elif s == 'v':
         return OrderedDict(sorted(d.items(), key=lambda (k, v): v, reverse=r))
+    elif s == 'vl':
+        return OrderedDict(sorted(d.items(), key=lambda (k, v): v[i], reverse=r))
