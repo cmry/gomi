@@ -1,7 +1,7 @@
 __author__ = 'chris'
 
 from urllib2 import urlopen
-from main.query import *
+from central_core.query import *
 
 
 class Urban:

@@ -5,7 +5,7 @@ import re
 import codecs
 from twitter import *
 from collections import Counter
-from main.query import *
+from central_core.query import *
 
 
 class Twemo:

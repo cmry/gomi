@@ -4,9 +4,9 @@ __file__ = 'glados.py'
 import irclib
 import sys
 from time import sleep
-from main.conf import *
-from main.commands import *
-from main.logger import *
+from central_core.conf import *
+from central_core.commands import *
+from central_core.logger import *
 
 
 class IRCCat(irclib.SimpleIRCClient):
@@ -16,6 +16,7 @@ class IRCCat(irclib.SimpleIRCClient):
         irclib.SimpleIRCClient.__init__(self)
         self.tag = chl
         self.log = Log()
+        self.cmd = CoreStrap()
 
     def on_welcome(self, con, evt):
         """ Used for joining, can't be simplified or talk function will break. """
@@ -29,25 +30,25 @@ class IRCCat(irclib.SimpleIRCClient):
         """ Generates command list, needed to reload alterations on the fly.
             Also handles pushing commands and reactions through decision tree. """
         try:
-            cmd = CmdStrap()
             message, nick = evt.arguments()[0], evt.source()[0:evt.source().find("!")]
             self.log.feed(message, nick)
-            if message.lower().find("glados") != -1:
-                self.talk(cmd.own(message, nick, self.log))
+            if message.lower().startswith(":"):
+                core_out = self.cmd.own(message, nick, self.log)
+                if core_out:
+                    self.talk(core_out)
+            elif message.lower().find('glados') != -1:
+                self.talk(self.cmd.quote())
             else:
-                self.talk(cmd.gen(message, nick, self.log)) if cmd.gen(message, nick, self.log) else sleep(1)
-            del cmd
+                self.talk(self.cmd.gen(message, nick, self.log)) if self.cmd.gen(message, nick, self.log) else sleep(1)
         except Exception as e:
             #prevent disconnects due to crappy programming
             self.talk("The cake is a lie."); print e
 
     def on_privmsg(self, con, evt):
         try:
-            cmd = CmdStrap()
             message, con, nick = evt.arguments()[0], self.connection, evt.source()[0:evt.source().find("!")]
-            if message.lower().find("glados") != -1:
-                self.talk(cmd.own(message, nick, self.log), nick)
-            del cmd
+            if message.lower().startswith(":"):
+                self.talk(self.cmd.own(message, nick, self.log), nick)
         except Exception as e:
             print e
 
@@ -62,6 +63,7 @@ class IRCCat(irclib.SimpleIRCClient):
     def on_disconnect(self, con, evt):
         """ On disconnect, try reloading. Not working? """
         main()
+
 
 def main():
     server = IRCCat(cl)

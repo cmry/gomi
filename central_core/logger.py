@@ -1,6 +1,7 @@
 __author__ = 'chris'
 __file__ = 'logger.py'
 
+
 class Log:
 
     def __init__(self):

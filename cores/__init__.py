@@ -1,9 +1,10 @@
 __author__ = 'chris'
-from cores.twemo import *
-from cores.wiki import *
-from cores.urban import *
-from cores.aucopro import *
-from cores.nsanews import *
-from cores.trans import *
-from cores.noty import *
-from cores.lang import *
+import twemo 
+import wiki 
+import urban 
+import aucopro 
+import nsanews 
+import trans 
+import noty 
+import lang 
+import gool 
