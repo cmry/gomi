@@ -1,0 +1,46 @@
+\documentclass[10pt, a4paper, twopage, headinclude, footinclude, BCOR5mm]{book}
+
+\input{structure.tex}
+
+\DeclareUnicodeCharacter{00A0}{ }
+
+\usepackage[left=108pt,right=106pt]{geometry}
+\usepackage{makeidx}
+\usepackage{float}
+\usepackage{tocloft}
+% \usepackage{epstopdf}
+% \usepackage{}
+
+\makeindex
+\setlength{\cftsecnumwidth}{0pt}
+\renewcommand{\cftsecaftersnumb}{\hspace{1.5em}}
+
+
+\hyphenation{Fortran hy-phen-ation}
+
+% \title{\textbf{This is an insanely long title for a paper: please break the hell out of it}}
+% \author{}
+% % \author[1]{Bob Superextremelylongname}
+% % \affil[1]{University of Superlongnuniname}
+% % \author[2]{Keith Normalname}
+% % \affil[2]{University}
+% % \author[2]{Ivo Doe}
+% % \author[2]{Alice Doe}
+% \date{} 
+\begin{document}
+
+\renewcommand{\subsectionmark}[1]{\markright{\thesubsection~#1}} 
+\lehead{\mbox{\llap{\small\thepage\kern1em\color{halfgray} \vline}\color{halfgray}\hspace{0.5em}\rightmark\hfil}}
+
+\pagestyle{scrheadings}
+
+\tableofcontents
+\chapter{Abstracts}
+
+% abstracts
+
+\newpage
+\chapter{Author Index}
+\printindex
+
+\end{document}
