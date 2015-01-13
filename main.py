@@ -14,10 +14,10 @@ tex = '''
 
 \\begin{figure}[t!]
 \\centering
----tr---
 \\large\\textbf{---ti---}
 \\vspace*{0.5cm}
 \\end{figure}
+---tr---
 ---na---
 \\noindent
 ---te--- '''
@@ -106,50 +106,25 @@ def check_double_ref(text):
 
 
 def format_text(text):
-    texti, upto = text.split(), False
-    # if '[1]' in text:
-    #     textii = check_double_ref(text)
-    #     if '[1]' in textii:
-    #         upto = textii.index('[1]')
-    # if 'references:' in texti:
-    #     upto = texti.index('references:')
-    # if '\nreference' in text.lower():
-    #     if 'references' in texti:
-    #         upto = texti.index('references')
-    #     if 'references:' in texti:
-    #         upto = texti.index('references:')
-    #     if 'reference:' in texti:
-    #         upto = texti.index('reference:')
-    ref = findall(r'\n[Rr]eference[s]?[:]?', text)
-    brf = findall(r'\[0-9\]', text)
-    if brf and not ref:
-        print "TARD ALERT: "+tex
-    else:
-        # want to cutoff, avoid split because it craps up the newlines
-        refl = texti[texti.index(ref[-1:])]
-        refi = refl.pop(0)
-
-
-    # if upto:
-    #     tex, i = [], 0
-    #     for x in text.split():
-    #         if i >= upto:
-    #             break
-    #         else:
-    #             tex.append(x)
-    #             i += 1
-    #     text = ' '.join(tex)
-    # check page 44, 48
-
-    # refnr = findall(r'\[[0-9]\]', ' '.join(textl[0]))
-    # if len(textl) > 1:
-    #     refs = textl[1].split('\n')
-    #     exit(refs)
-    return text
+    ref = findall(r'\n(?:[Rr]eference)|(?:REFERENCE)[sS]?[:]?', text)
+    brf = findall(r'\n\[[0-9]\]', text)
+    tref = ''
+    if brf or ref:
+        tl = text.split((brf[-1:] if (brf and not ref) else ref[-1:])[0])
+        text, ref = tl[0], tl[1]
+        # TODO: this shit does not work yet
+        # tref = '\\begin{thebibliography}{10}\n'+('\n'.join(['\\bibitem{'+n+'}' for n in ref.split('\n')]))+'\\end{thebibliography}\n'
+    return text+'\n'+tref
 
 
 def format_toc(tit, name_l):
-    aut = ', '.join([('\\newline ' if (name_l.index(n) == 4 and len(', '.join(name_l[:4])) < 72) else '') + n[0]+' '+n[1] for n in name_l])
+    # TODO: these are the ugliest two one-liners in existance, please fix them to something 
+    # readable; first converts tuples to strings, checks in dict, why not have either tuples 
+    # in dict or just join to string and then do the second function for adding, because 
+    # that converts to a string anyway. First one breaks everything, great.
+    # name_l = [(i.split()[0], i.split()[1]) for i in [n[0]+' '+n[1] if n[0]+' '+n[1] not in cust else cust[n[0]+' '+n[1]] for n in name_l]]
+    aut = ', '.join([('\\newline ' if (name_l.index(n) == 4 and len(', '.join([n[0]+' '+n[1] for n in name_l[:3]])) < 72) else '') + n[0]+' '+n[1] for n in name_l])
+    # --------------------------------------------------------------------------------------
     aut = aut.split(' \\newline')
     tit = sanitize(tit.replace('\\\\ ', ''))
     tit = "\\addcontentsline{toc}{section}{\\emph{" + tit + "}} \n" + \
