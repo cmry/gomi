@@ -1,0 +1,72 @@
+{ "agenda": {
+	"Registration + coffee": {
+		"time": "9:00 - 9:30",
+		"tracks": [],
+		"blocks": []
+	}, 
+	"Session 1": {
+		"time": "9:30 - 10:50",
+		"tracks": [
+			"Spelling & Normalization", 
+			"Computational Psycholinguistics",
+			"Syntax",
+			"Opinion",
+			"Speech & Discourse"],
+		"blocks": [[11, 63, 81, 32], [35, 42, 85, 21], [17, 56, 55, 83], [64, 77, 89, 40], [7, 12, 51, 68]]
+	}, 
+	"Coffee": {
+		"time": "10:50 - 11:20",
+		"tracks": [],
+		"blocks": []
+	}, 
+	"Plenary Session": {
+		"time": "11:20 - 12:40",
+		"tracks": [],
+		"blocks": [
+			"Welcome (5')", 
+			"STIL Thesis Award (5')",
+			"CLARIN NL (5')",
+			"OpenSONAR (5')",
+			"Keynote Speaker (50' + 10' questions)"]
+	}, 
+	"Lunch": {
+		"time": "12:40 - 13:30",
+		"tracks": [],
+		"blocks": []
+	}, 
+	"Poster / demo session": {
+		"time": "13:15 - 14:40",
+		"tracks": [],
+		"blocks": []
+	}, 
+	"Session 2": {
+		"time": "14:00 - 15:20",
+		"tracks": [
+			"Language Models", 
+			"Semantics",
+			"Agent-based Modelling",
+			"Text Mining",
+			"DH & Creativity"],
+		"blocks": [[13, 14, 36, 60], [24, 61, 87, 93], [9, 46, 78, 69], [38, 74, 47, 71],[30, 45, 96, 50]]	
+	},
+	"Coffee": {
+		"time": "15:20 - 15:50",
+		"tracks": [],
+		"blocks": []
+	}, 
+	"Session 3": {
+		"time": "15:50 - 17:10",
+		"tracks": [
+			"Machine Translation", 
+			"NER & WSD",
+			"Grammar & Syntax",
+			"Social Media",
+			"Industry Track"],
+		"blocks": [[62, 15, 58, 65], [31, 29, 39, 59], [43, 75, 82, 23], [49, 19, 25, 26], [16, 70, 86, 88]]
+	}, 
+	"Reception": {
+		"time": "17:10 - 18:10",
+		"tracks": [],
+		"blocks": []
+	}
+}}

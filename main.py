@@ -8,6 +8,7 @@ import xml.etree.ElementTree as ET
 from collections import OrderedDict
 from copy import deepcopy
 from re import findall
+from json import loads
 
 tex = '''
 \\newpage
@@ -257,6 +258,21 @@ def format_table(namel, afil, maill):
     return '\n'.join(ltab)
 
 
+def get_agenda(d):
+    ag_tab = """
+
+    """
+    with open('agenda.json', 'r') as f:
+        l = loads(f.read())
+    for event in l["agenda"]:
+        if event["tracks"] and event["blocks"]:  # Plenary
+            pass
+        elif event["blocks"] and not event["tracks"]:  # Talks
+            pass
+        else:  # Break etc.
+            pass
+
+
 def get_refs():
     global bib
     bib = OrderedDict(sorted(bib.items(), key=lambda (k, v): v))
@@ -271,7 +287,7 @@ def main():
 
     tree = ET.parse('abstracts.xml')
     submissions = tree.getroot()
-    abst = {}
+    abst, agd = {}, {}
 
     for submission in submissions:
         if not 'REJECT' in submission[3].text:
@@ -291,10 +307,12 @@ def main():
             dc = dc.replace('---tr---', format_toc(title, names))
             dc = dc.replace('---na---', format_table(names, afils, mails))
             abst[submission[0].text] = dc
+            agd[sd] = (title, names)
 
     with open('./tex/bos_test.tex', 'r') as i:
         o = open('./tex/bos_o.tex', 'w')
         i = i.read()
+        i = i.replace('% agenda', get_agenda(agd))
         i = i.replace('% abstracts', '\n'.join([v for v in OrderedDict(sorted(abst.items(),
                           key=lambda t: t[0])).itervalues()]).encode("utf-8"))
         i = i.replace('% refl', get_refs().encode("utf-8"))
