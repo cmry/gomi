@@ -1,5 +1,7 @@
 \documentclass[10pt, a4paper, twopage, headinclude, footinclude, BCOR5mm]{book}
 
+\usepackage[hyphens]{url}
+
 \input{structure.tex}
 
 \DeclareUnicodeCharacter{00A0}{ }
@@ -9,7 +11,6 @@
 \usepackage{float}
 \usepackage{tocloft}
 % \usepackage{epstopdf}
-% \usepackage{}
 
 \makeindex
 \setlength{\cftsecnumwidth}{0pt}
@@ -35,14 +36,15 @@
 \pagestyle{scrheadings}
 
 \tableofcontents
-\chapter{Abstracts}
+\chapter*{Abstracts}
 
 % abstracts
+
+\Urlmuskip=0mu plus 1mu\relax
 
 % refl
 
 \newpage
-\chapter{Author Index}
 \printindex
 
 \end{document}
