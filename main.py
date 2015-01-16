@@ -36,6 +36,8 @@ ctab = '''
 
 bib = {}
 
+retr = [28, 8, 18, 20, 43]
+
 inil = {'Van ': 'van ', 'Den ': 'den ', 'Der ': 'der ', 'De ': 'de ',
         'Het ': 'het ', "'T ": "'t ", 'Des ': 'des ', 'Op ': 'op '}
 titl = ['and', 'the', 'a', 'for', 'in']
@@ -81,6 +83,7 @@ def sanitize(texs, istex=None):
         texs = texs.replace(orig, repl)
     if not istex:  # text only
         texs = texs.replace('\n', ' ')
+        texs = texs.replace(u"""(1)		riet‘reet’		dimensie‘dimension’	 	phonemes	[r	i	t]		d	i=	[m	E	n]=	s	i	[…]	 main stress 	graphemes	r	ie	t		d	i=	m	e	n=	s	ie	dv	default value 	relation	dv	dv	dv		dv	3.3	dv	dv	dv	3.13	4.4	=	syll.boundary""", '\\input{custfig}')
         texs = token_url(texs, True)
     return texs
 
@@ -168,7 +171,7 @@ def format_toc(tit, name_l):
     aut = ', '.join([('\\newline ' if (name_l.index(n) == 4 and len(', '.join([n[0]+' '+n[1] for n in name_l[:3]]))
                                        < 72) else '') + n[0]+' '+n[1] for n in name_l])
     aut = aut.split(' \\newline')
-    tit = sanitize(tit.replace('\\\\ ', ''))
+    tit = tit.replace('\\\\ ', '')
     tit = "\\addcontentsline{toc}{section}{\\emph{" + tit + "}} \n" + \
           "\\addtocontents{toc}{\\protect\\vspace{0.2em}} \n" + \
           "\\addtocontents{toc}{" + aut[0] + " \\hfill" + ("\\newline" if len(aut) > 1 else '') + "} \n"
@@ -258,29 +261,68 @@ def format_table(namel, afil, maill):
     return '\n'.join(ltab)
 
 
-def get_agenda(d):
-    ag_tab = """
+# TODO: make the two tables as in these functions
+def agt(a, c):
+    return '''
+\\begin{landscape}
+\\begin{centering}
+\\begingroup
+\\setlength{\LTleft}{-20cm plus -1fill}
+\\setlength{\LTright}{\LTleft}
+\\footnotesize
+\\begin{longtable}{%s}
+\\toprule
+%s
+\\bottomrule
+\\end{longtable}
+\\endgroup
+\\end{centering}
+\\end{landscape}''' % (a, c)
 
-    """
+
+def get_agenda(d):
+    lin = list()
     with open('agenda.json', 'r') as f:
         l = loads(f.read())
-    for event in l["agenda"]:
-        if event["tracks"] and event["blocks"]:  # Plenary
-            pass
-        elif event["blocks"] and not event["tracks"]:  # Talks
-            pass
+    for entry in sorted(l["agenda"]):
+
+        event = l["agenda"][entry]
+
+        if event["blocks"] and not event["tracks"]:  # Plenary
+            lin.append('\\midrule \n %s & \\multicolumn{5}{c}{\\textbf{%s:} %s} \\\\' % (event["time"], event["name"], ', '.join(event["blocks"])))
+
+        elif event["blocks"] and event["tracks"]:  # Talks
+            lin.append('\\midrule \n \\textbf{%s} & %s \\\\ \n %s & \\textbf{%s} \\\\' % (event["name"], ' & '.join(event["rooms"]), event["time"], '} & \\textbf{'.join(event["tracks"])))
+            for i in range(0, len(event["blocks"])-1):
+                lin.append('\\midrule\n')
+                row = [' \\newline '.join(d[event["blocks"][j][i]]) for j in range(0, len(event["blocks"][i])+1)]
+                lin.append(' & %s \\\\' % ' & '.join(row))
         else:  # Break etc.
-            pass
+            lin.append('\\midrule \n %s & \\textbf{%s} \\\\' % (event["time"], event["name"]))
+
+    return agt('lp{3.5cm}p{3.5cm}p{3.5cm}p{3.5cm}p{3.5cm}', '\n'.join(lin))
 
 
 def get_refs():
     global bib
     bib = OrderedDict(sorted(bib.items(), key=lambda (k, v): v))
-    bibt = '\\chapter*{Bibliography} \n\\begin{itemize} \n'
+    bibt = '\\chapter*{References} \n\\begin{itemize} \n'
     for tup, cit in bib.iteritems():
         bibt += '\\item[\\pageref{'+tup[1]+'}] '+cit+'\n'
     bibt += '\n \\end{itemize}'
     return bibt
+
+
+def clean_info(title, subm):
+    # other one don't tuple
+    namel = [(sanitize(entry[0].text) + ' ' + lower_dut(entry[1].text)) for entry in subm]
+    # if len(namel) > 3:
+    #     namel = namel[:3]
+    #     namel.append('et. al')
+    namel = ', '.join(namel)
+    title = '\\textbf{'+title.replace(' \\\\ ', ' ')+'}'
+    return title, namel
+
 
 
 def main():
@@ -290,16 +332,17 @@ def main():
     abst, agd = {}, {}
 
     for submission in submissions:
-        if not 'REJECT' in submission[3].text:
+        if not 'REJECT' in submission[3].text and int(submission.attrib['id']) not in retr:
             dc = str(tex)
 
-            sd = submission.attrib['id']
+            sd = int(submission.attrib['id'])
             kw = [k.text for k in submission[1]]
 
             title = format_title(submission[0].text)
             dc = dc.replace('---ti---', title)
             dc = dc.replace('---te---', format_text(submission[2].text, title))
 
+            # make this into a typle
             names = [(sanitize(entry[0].text), lower_dut(entry[1].text)) for entry in submission[4]]
             afils = [sanitize(entry[3].text) for entry in submission[4]]
             mails = [(sanitize(entry[2].text) if entry[2].text else '') for entry in submission[4]]
@@ -307,12 +350,14 @@ def main():
             dc = dc.replace('---tr---', format_toc(title, names))
             dc = dc.replace('---na---', format_table(names, afils, mails))
             abst[submission[0].text] = dc
-            agd[sd] = (title, names)
+            agd[sd] = (clean_info(title, submission[4]))  # TODO: clean that out earlier
+            for i in retr:
+                agd[i] = ('', '')
 
     with open('./tex/bos_test.tex', 'r') as i:
         o = open('./tex/bos_o.tex', 'w')
         i = i.read()
-        i = i.replace('% agenda', get_agenda(agd))
+        i = i.replace('% agenda', get_agenda(agd).encode("utf-8"))
         i = i.replace('% abstracts', '\n'.join([v for v in OrderedDict(sorted(abst.items(),
                           key=lambda t: t[0])).itervalues()]).encode("utf-8"))
         i = i.replace('% refl', get_refs().encode("utf-8"))

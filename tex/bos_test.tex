@@ -9,8 +9,19 @@
 \usepackage[left=108pt,right=106pt]{geometry}
 \usepackage{makeidx}
 \usepackage{float}
+\usepackage{scrextend}
 \usepackage{tocloft}
-% \usepackage{epstopdf}
+\usepackage{etoolbox}
+\usepackage{epstopdf}
+
+\usepackage{lscape}
+\usepackage{longtable}
+
+\makeatletter
+\let\zzLT@output\LT@output
+\def\unboxlastpage#1\@colht\vbox{#1\@colht}
+\def\LT@output{\expandafter\unboxlastpage\zzLT@output}
+\makeatother
 
 \makeindex
 \setlength{\cftsecnumwidth}{0pt}
@@ -19,21 +30,26 @@
 
 \hyphenation{Fortran hy-phen-ation}
 
-% \title{\textbf{This is an insanely long title for a paper: please break the hell out of it}}
-% \author{}
-% % \author[1]{Bob Superextremelylongname}
-% % \affil[1]{University of Superlongnuniname}
-% % \author[2]{Keith Normalname}
-% % \affil[2]{University}
-% % \author[2]{Ivo Doe}
-% % \author[2]{Alice Doe}
-% \date{} 
 \begin{document}
 
-\renewcommand{\subsectionmark}[1]{\markright{\thesubsection~#1}} 
-\lehead{\mbox{\llap{\small\thepage\kern1em\color{halfgray} \vline}\color{halfgray}\hspace{0.5em}\rightmark\hfil}}
+\newcommand{\confAuth}{Chris Emmery}
+\newcommand{\confCover}{Tom De Smedt}
+\newcommand{\confName}{25th Meeting of Computational Linguistics in the Netherlands}
+\newcommand{\confAbr}{CLIN 2015}
+\newcommand{\confLoc}{Antwerp}
+\newcommand{\confOrg}{CLiPS}
+\newcommand{\confDate}{4 February, 2015}
+\newcommand{\confBind}{...}
 
-\pagestyle{scrheadings}
+\input{title}
+\input{titleback}  
+\input{preface}
+\input{extraback}
+\input{sponsors} 
+
+% preface
+
+% extra back
 
 % titp
 
@@ -44,6 +60,11 @@
 % agenda
 
 \tableofcontents
+
+\renewcommand{\subsectionmark}[1]{\markright{\thesubsection~#1}} 
+\lehead{\mbox{\llap{\small\thepage\kern1em\color{halfgray} \vline}\color{halfgray}\hspace{0.5em}\rightmark\hfil}}
+\pagestyle{scrheadings}
+
 \chapter*{Abstracts}
 
 % abstracts
