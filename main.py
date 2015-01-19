@@ -11,7 +11,7 @@ from re import findall
 from json import loads
 
 bib = {}
-retr = [28, 8, 18, 20, 43]
+retr = [28, 8, 18, 20, 43, 97]
 
 
 def sanitize(texs, istex=None):
@@ -258,11 +258,11 @@ def format_table(namel, afil, maill):
     """
     ltab = []
     while len(namel) > 0:
-        ntab = deepcopy(author_tab(True))
+        ntab = deepcopy(author_tab())
         if len(namel) == 1:
             if len(ltab) != 0:
-                ntab = author_tab() + ntab
-            ntab += author_tab()
+                ntab = author_tab(True) + ntab
+            ntab += author_tab(True)
             name_e = format_name(namel.pop(0))
             ta = "%s \\\\ {%s} \\\\ {\\texttt{%s}} \\\\" % (name_e, afil.pop(0), maill.pop(0))
             al = 'c'
@@ -279,7 +279,7 @@ def format_table(namel, afil, maill):
             ntab = ntab.replace('---al---', al)
         ltab.append(ntab)
     if '\\end{table}' not in ltab[len(ltab)-1]:
-        ltab.append(author_tab())
+        ltab.append(author_tab(True))
     return '\n'.join(ltab)
 
 
@@ -328,15 +328,19 @@ def get_agenda(d):
     for entry in sorted(l["agenda"]):
 
         event = l["agenda"][entry]
-
-        if event["blocks"] and not event["tracks"]:  # Plenary
-            lin.append('\\midrule \n %s & \\multicolumn{5}{c}{\\textbf{%s:} %s} \\\\' % (event["time"], event["name"], ', '.join(event["blocks"])))
-
-        elif event["blocks"] and event["tracks"]:  # Talks
-            lin.append('\\midrule \n \\textbf{%s} & %s \\\\ \n %s & \\textbf{%s} \\\\' % (event["name"], ' & '.join(event["rooms"]), event["time"], '} & \\textbf{'.join(event["tracks"])))
-            for i in range(0, len(event["blocks"])-1):
+        if "what" in event:  # Plenary
+            lin.append('\\midrule \n %s & \\multicolumn{5}{l}{\\textbf{%s:} %s %s in %s} \\\\' % (event["time"], event["name"], event["what"], event["by"], event["room"]))
+        elif "sessions" in event:  # Talks
+            namel, rooml, block_m = [], [], []
+            for s in event["sessions"]:
+                inf = event["sessions"][s]
+                namel.append(inf["name"])
+                rooml.append(inf["room"])
+                block_m.append(inf["blocks"])
+            lin.append('\\midrule \n \\textbf{%s} & %s \\\\ \n %s & \\textbf{%s} \\\\' % (event["name"], ' & '.join(rooml), event["time"], '} & \\textbf{'.join(namel)))
+            for i in range(0, len(block_m)-1):
                 lin.append('\\midrule\n')
-                row = [' \\newline '.join(d[event["blocks"][j][i]]) for j in range(0, len(event["blocks"][i])+1)]
+                row = [' \\newline '.join(d[block_m[j][i]]) for j in range(0, len(block_m))]
                 lin.append(' & %s \\\\' % ' & '.join(row))
         else:  # Break etc.
             lin.append('\\midrule \n %s & \\textbf{%s} \\\\' % (event["time"], event["name"]))
@@ -345,6 +349,13 @@ def get_agenda(d):
 
 
 def get_refs():
+    """
+    Constructs the references from an itemized LaTeX list with
+    pagerefs and the _raw_ references extracted from the
+    abstracts in format_text, put in bib.
+
+    :return: str LaTeX list of references
+    """
     global bib
     bib = OD(sorted(bib.items(), key=lambda (k, v): v))
     bibt = '\\chapter*{References} \n\\begin{itemize} \n'
@@ -354,12 +365,21 @@ def get_refs():
     return bibt
 
 
+# TODO: check if this namel tuple makes any sense (used more as string than tuple?)
 def clean_info(title, subm):
+    """
+    This will format the title and authors for the conference
+    programme in the desired format.
+
+    :param title: str abstract title
+    :param subm: list of tup with int(id): tup(first, last)
+    :return: str LaTeX conference programme
+    """
     # other one don't tuple
     namel = [(sanitize(entry[0].text) + ' ' + lower_dutch_prep(entry[1].text)) for entry in subm]
-    # if len(namel) > 3:
-    #     namel = namel[:3]
-    #     namel.append('et. al')
+    if len(namel) > 5:
+        namel = namel[:5]
+        namel.append('et. al')
     namel = ', '.join(namel)
     title = '\\textbf{'+title.replace(' \\\\ ', ' ')+'}'
     return title, namel
@@ -403,7 +423,7 @@ def main():
         if not 'REJECT' in submission[3].text and int(submission.attrib['id']) not in retr:
 
             submission_id = int(submission.attrib['id'])
-            keywords = [k.text for k in submission[1]]
+            # keywords = [k.text for k in submission[1]]
 
             title = format_title(submission[0].text)
             names = [(sanitize(entry[0].text), lower_dutch_prep(entry[1].text)) for entry in submission[4]]
