@@ -2,45 +2,17 @@
 # -*- coding: utf-8 -*-
 
 __author__ = 'chris'
-__version__ = '12.14'
+__version__ = '01.15'
 
 import xml.etree.ElementTree as ET
-from collections import OrderedDict
+from collections import OrderedDict as OD
 from copy import deepcopy
 from re import findall
 from json import loads
 
-tex = '''
-\\newpage
-
-\\begin{figure}[t!]
-\\centering
-\\large\\textbf{---ti---}
-\\vspace*{0.5cm}
-\\end{figure}
----tr---
----na---
-\\noindent
----te--- '''
-
-btab = '''
-\\begin{table}[t!]
-\\makebox[\\textwidth]{
-\\centering
-\\begin{tabular}{---al---}
----ta--- '''
-
-ctab = '''
-\\end{tabular} }
-\\end{table} '''
-
 bib = {}
-
 retr = [28, 8, 18, 20, 43]
 
-inil = {'Van ': 'van ', 'Den ': 'den ', 'Der ': 'der ', 'De ': 'de ',
-        'Het ': 'het ', "'T ": "'t ", 'Des ': 'des ', 'Op ': 'op '}
-titl = ['and', 'the', 'a', 'for', 'in']
 
 def sanitize(texs, istex=None):
     """
@@ -93,7 +65,7 @@ def token_url(text, fn=False):
     Recognizes URLs in text and format them so that they will be
     placed in a footnote underneath the abstract. It also makes sure
     that certain stylistic clashes are omitted, for example a colon
-     before the footnote number.
+    before the footnote number.
 
     :param text: str unicode text
     :return: str with footnoted URLs
@@ -198,49 +170,99 @@ def check_prio(tl):
             return mark.index(':')+1
 
 
-def format_title(tit):
+# TODO: check if for each function it is mentioned if they output LaTeX
+def format_title(title):
     """
+    Will _try_ to make an intelligent decision on where to split
+    the inputted title. Please be aware that this is font/point/
+    page specific as it will incorporate length. 62 < len(title)
+    < 96. Will try to figure out some variables for this.
 
-    :param tit:
+    :param title: str title without any breaks (yet)
+    :return: 'intelligently' splitted title for LaTeX
+    """
+    # TODO: try to make 62 < x < 96 user handable, check page 41
+    newline_indicators = ['and', 'the', 'a', 'for', 'in']
+    title = sanitize(title)
+    if 62 < len(title) < 96:
+        title_list = title.split()
+        title_list.insert(len(title_list)/2 if not check_prio(title_list) else check_prio(title_list), '\\\\')
+        for word in list(set(title_list) & set(newline_indicators)):
+            if title_list.index(word)-title_list.index('\\\\') == 1 and ':' not in title_list[title_list.index(word)-2]:
+                a, b = title_list.index(word), title_list.index('\\\\')
+                title_list[a], title_list[b] = title_list[b], title_list[a]
+        title = ' '.join(title_list)
+    if title[-1:] == '.':
+        title = title[:-1]
+    return title
+
+
+def lower_dutch_prep(surename):
+    """
+    Converts 'incorrectly' capitalized Dutch surenames to a more
+    conistent format.
+
+    :param surename:
     :return:
     """
-    global titl
-    tit = sanitize(tit)
-    if 62 < len(tit) < 96:
-        tl = tit.split()
-        tl.insert(len(tl)/2 if not check_prio(tl) else check_prio(tl), '\\\\')
-        for word in list(set(tl) & set(titl)):
-            if tl.index(word)-tl.index('\\\\') == 1 and ':' not in tl[tl.index(word)-2]: # page 41
-                a, b = tl.index(word), tl.index('\\\\')
-                tl[a], tl[b] = tl[b], tl[a]
-        tit = ' '.join(tl)
-    if tit[-1:] == '.':
-        tit = tit[:-1]
-    return tit
-
-
-def lower_dut(surename):
-    global inil
-    for ini in inil.iterkeys():
+    prep_list = {'Van ': 'van ', 'Den ': 'den ', 'Der ': 'der ', 'De ': 'de ',
+                 'Het ': 'het ', "'T ": "'t ", 'Des ': 'des ', 'Op ': 'op '}
+    for ini in prep_list.iterkeys():
         if ini in surename:
-            surename = surename.replace(ini, inil[ini])
+            surename = surename.replace(ini, prep_list[ini])
     return surename
 
 
 def format_name(name):
+    """
+    Joins and formats name with index. Might be superflous.
+
+    :param name: tup with (first, last) name.
+    :return: str joined name with index reference
+    """
     st_name = name[0]+' '+name[1]
     return st_name + " \\index{" + name[1] + ", " + name[0] + "} "
 
 
+def author_tab(bottom=False):
+    """
+    Outputs table that is utilized to properly format the list
+    of authors, neatly centered, in the abstract.
+
+    :param bottom: bool want the bottom part of the table?
+    :return: str part of the author table
+    """
+    return '''
+        \\begin{table}[t!]
+        \\makebox[\\textwidth]{
+        \\centering
+        \\begin{tabular}{---al---}
+        ---ta--- ''' if not bottom else '''
+        \\end{tabular} }
+        \\end{table} '''
+
+
 def format_table(namel, afil, maill):
-    global ctab, btab
+    """
+    Pretty elaborate function that determines how to format the
+    tables used to format the auhtor lists. In this format, it
+    is chosen to keep positioning the authors with two in a row,
+    until there is only one left, that one will be centered in
+    a new table with an allignment of only one {c}.
+
+    :param namel: list with full author names in str format
+    :param afil: list with author affiliations in str format
+    :param maill: list with contact emails in str format
+    :return: one (in case of 1-2 authors) or two (>2) author
+             LaTeX tables
+    """
     ltab = []
     while len(namel) > 0:
-        ntab = deepcopy(btab)
+        ntab = deepcopy(author_tab(True))
         if len(namel) == 1:
             if len(ltab) != 0:
-                ntab = ctab + ntab
-            ntab += ctab
+                ntab = author_tab() + ntab
+            ntab += author_tab()
             name_e = format_name(namel.pop(0))
             ta = "%s \\\\ {%s} \\\\ {\\texttt{%s}} \\\\" % (name_e, afil.pop(0), maill.pop(0))
             al = 'c'
@@ -257,30 +279,49 @@ def format_table(namel, afil, maill):
             ntab = ntab.replace('---al---', al)
         ltab.append(ntab)
     if '\\end{table}' not in ltab[len(ltab)-1]:
-        ltab.append(ctab)
+        ltab.append(author_tab())
     return '\n'.join(ltab)
 
 
 # TODO: make the two tables as in these functions
 def agt(a, c):
+    """
+    Formats the table for the agenda, in landscape, and uses set-
+    lenght to center.
+
+    :param a: str the alignments and borders for the table in
+              LaTeX format
+    :param c: list of str with table lines constructed in
+              get_agenda
+    :return: str LaTeX table with inserted content
+    """
     return '''
-\\begin{landscape}
-\\begin{centering}
-\\begingroup
-\\setlength{\LTleft}{-20cm plus -1fill}
-\\setlength{\LTright}{\LTleft}
-\\footnotesize
-\\begin{longtable}{%s}
-\\toprule
-%s
-\\bottomrule
-\\end{longtable}
-\\endgroup
-\\end{centering}
-\\end{landscape}''' % (a, c)
+    \\begin{landscape}
+    \\begin{centering}
+    \\begingroup
+    \\setlength{\LTleft}{-20cm plus -1fill}
+    \\setlength{\LTright}{\LTleft}
+    \\footnotesize
+    \\begin{longtable}{%s}
+    \\toprule
+    %s
+    \\bottomrule
+    \\end{longtable}
+    \\endgroup
+    \\end{centering}
+    \\end{landscape}''' % (a, c)
 
 
+# TODO: it might a nice idea to store the LaTeX commands in a function to call in python
 def get_agenda(d):
+    """
+    This will construct a conference programme using a dict with
+    submissions id, author and titles according to the specified
+    ordering in agenda.json.
+
+    :param d: dict with int(id): tup(authors, title)
+    :return: str agenda in a LaTeX table
+    """
     lin = list()
     with open('agenda.json', 'r') as f:
         l = loads(f.read())
@@ -305,7 +346,7 @@ def get_agenda(d):
 
 def get_refs():
     global bib
-    bib = OrderedDict(sorted(bib.items(), key=lambda (k, v): v))
+    bib = OD(sorted(bib.items(), key=lambda (k, v): v))
     bibt = '\\chapter*{References} \n\\begin{itemize} \n'
     for tup, cit in bib.iteritems():
         bibt += '\\item[\\pageref{'+tup[1]+'}] '+cit+'\n'
@@ -315,7 +356,7 @@ def get_refs():
 
 def clean_info(title, subm):
     # other one don't tuple
-    namel = [(sanitize(entry[0].text) + ' ' + lower_dut(entry[1].text)) for entry in subm]
+    namel = [(sanitize(entry[0].text) + ' ' + lower_dutch_prep(entry[1].text)) for entry in subm]
     # if len(namel) > 3:
     #     namel = namel[:3]
     #     namel.append('et. al')
@@ -324,41 +365,64 @@ def clean_info(title, subm):
     return title, namel
 
 
+def tex(ti, tr, na, te):
+    """
+    This is the main building table for each abstract, being a
+    centered figure with a title, a block for page and ToC
+    reference, a table of authors, and the content of the
+    abstract.
+
+    :param ti: str title with // for breaks
+    :param tr: str list with pagerefs and custom
+               toc entries from format_toc
+    :param na: str table with authors from format_table
+    :param te: str sanitized text from format_tex
+    :return: str abstract page in LaTeX
+    """
+    return '''
+    \\newpage
+
+    \\begin{figure}[t!]
+    \\centering
+    \\large\\textbf{%s}
+    \\vspace*{0.5cm}
+    \\end{figure}
+    %s
+    %s
+    \\noindent
+    %s ''' % (ti, tr, na, te)
+
 
 def main():
 
     tree = ET.parse('abstracts.xml')
     submissions = tree.getroot()
-    abst, agd = {}, {}
+    abstract_dict, agenda_dict = {}, {}
 
     for submission in submissions:
         if not 'REJECT' in submission[3].text and int(submission.attrib['id']) not in retr:
-            dc = str(tex)
 
-            sd = int(submission.attrib['id'])
-            kw = [k.text for k in submission[1]]
+            submission_id = int(submission.attrib['id'])
+            keywords = [k.text for k in submission[1]]
 
             title = format_title(submission[0].text)
-            dc = dc.replace('---ti---', title)
-            dc = dc.replace('---te---', format_text(submission[2].text, title))
-
-            # make this into a typle
-            names = [(sanitize(entry[0].text), lower_dut(entry[1].text)) for entry in submission[4]]
-            afils = [sanitize(entry[3].text) for entry in submission[4]]
+            names = [(sanitize(entry[0].text), lower_dutch_prep(entry[1].text)) for entry in submission[4]]
+            afilliations = [sanitize(entry[3].text) for entry in submission[4]]
             mails = [(sanitize(entry[2].text) if entry[2].text else '') for entry in submission[4]]
 
-            dc = dc.replace('---tr---', format_toc(title, names))
-            dc = dc.replace('---na---', format_table(names, afils, mails))
-            abst[submission[0].text] = dc
-            agd[sd] = (clean_info(title, submission[4]))  # TODO: clean that out earlier
-            for i in retr:
-                agd[i] = ('', '')
+            dc = tex(title, format_text(submission[2].text, title),
+                     format_toc(title, names), format_table(names, afilliations, mails))
 
-    with open('./tex/bos_test.tex', 'r') as i:
+            abstract_dict[submission[0].text] = dc
+            agenda_dict[submission_id] = (clean_info(title, submission[4]))  # TODO: clean that out earlier
+            for entry in retr:  # TODO: check if this is still needed
+                agenda_dict[entry] = ('', '')
+
+    with open('./tex/bos_i.tex', 'r') as i:
         o = open('./tex/bos_o.tex', 'w')
         i = i.read()
-        i = i.replace('% agenda', get_agenda(agd).encode("utf-8"))
-        i = i.replace('% abstracts', '\n'.join([v for v in OrderedDict(sorted(abst.items(),
+        i = i.replace('% agenda', get_agenda(agenda_dict).encode("utf-8"))
+        i = i.replace('% abstracts', '\n'.join([v for v in OD(sorted(abstract_dict.items(),
                           key=lambda t: t[0])).itervalues()]).encode("utf-8"))
         i = i.replace('% refl', get_refs().encode("utf-8"))
         o.write(i)
