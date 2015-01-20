@@ -69,7 +69,7 @@
 					"blocks": [24, 61, 87, 93]
 				}, 
 				"s08": {
-					"name": "Industry Track",
+					"name": "Industry Track I",
 					"room": "R.224",
 					"blocks": [16, 70, 86, 88]
 				},
@@ -114,9 +114,9 @@
 					"blocks": [49, 19, 25, 26]
 				}, 
 				"s15": {
-					"name": "Grammar \\& Syntax",
+					"name": "Industry Track II",
 					"room": "R.125",
-					"blocks": [43, 75, 82, 23]
+					"blocks": [99, 75, 82, 23]
 				}
 			}
 		}, 

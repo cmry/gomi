@@ -126,7 +126,7 @@ def format_text(text, title):
         tl = text.split((brf[-1:] if (brf and not ref) else ref[-1:])[0])
         text, ref = tl[0], sanitize(tl[1], True)
         format_ref(ref, label)
-    return sanitize(text)+'\n'+'\\label{'+label+'}'
+    return '\\noindent '+sanitize(text)+'\n'+'\\label{'+label+'}'
 
 
 def format_toc(tit, name_l):
@@ -409,8 +409,21 @@ def tex(ti, tr, na, te):
     \\end{figure}
     %s
     %s
-    \\noindent
     %s ''' % (ti, tr, na, te)
+
+
+def divide_abstracts(ad):
+    key, pres, demo, post = [], [], [], []
+    for v in OD(sorted(ad.items(), key=lambda t: t[0])).itervalues():
+        if 'keynote' in v[0]:
+            key.append(v[1])
+        elif 'presentation' in v[0]:
+            pres.append(v[1])
+        elif 'demo' in v[0]:
+            demo.append(v[1])
+        elif 'poster' in v[0]:
+            post.append(v[1])
+    return key, pres, demo, post
 
 
 def main():
@@ -424,26 +437,29 @@ def main():
 
             submission_id = int(submission.attrib['id'])
             # keywords = [k.text for k in submission[1]]
-
+            decision = submission[3].text
             title = format_title(submission[0].text)
             names = [(sanitize(entry[0].text), lower_dutch_prep(entry[1].text)) for entry in submission[4]]
             afilliations = [sanitize(entry[3].text) for entry in submission[4]]
             mails = [(sanitize(entry[2].text) if entry[2].text else '') for entry in submission[4]]
 
-            dc = tex(title, format_text(submission[2].text, title),
+            abstract = tex(title, format_text(submission[2].text, title),
                      format_toc(title, names), format_table(names, afilliations, mails))
 
-            abstract_dict[submission[0].text] = dc
+            abstract_dict[submission[0].text] = (decision, abstract)
             agenda_dict[submission_id] = (clean_info(title, submission[4]))  # TODO: clean that out earlier
             for entry in retr:  # TODO: check if this is still needed
                 agenda_dict[entry] = ('', '')
 
+    key, pres, demo, post = divide_abstracts(abstract_dict)
     with open('./tex/bos_i.tex', 'r') as i:
         o = open('./tex/bos_o.tex', 'w')
         i = i.read()
-        i = i.replace('% agenda', get_agenda(agenda_dict).encode("utf-8"))
-        i = i.replace('% abstracts', '\n'.join([v for v in OD(sorted(abstract_dict.items(),
-                          key=lambda t: t[0])).itervalues()]).encode("utf-8"))
+        i = i.replace('% agenda', get_agenda(agenda_dict).encode("utf-8"))      
+        i = i.replace('% keynote', '\n'.join(key).encode("utf-8"))
+        i = i.replace('% presentations', '\n'.join(pres).encode("utf-8"))
+        i = i.replace('% demos', '\n'.join(demo).encode("utf-8"))
+        i = i.replace('% posters', '\n'.join(post).encode("utf-8"))
         i = i.replace('% refl', get_refs().encode("utf-8"))
         o.write(i)
         o.close()
