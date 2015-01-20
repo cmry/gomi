@@ -13,7 +13,8 @@
 \usepackage{tocloft}
 \usepackage{etoolbox}
 \usepackage{epstopdf}
-
+\usepackage{multirow}
+\usepackage{rotating}
 \usepackage{lscape}
 \usepackage{longtable}
 
@@ -42,7 +43,7 @@
 \newcommand{\confBind}{Copy-Copy, Antwerpen}
 
 \input{title}
-\input{titleback}  
+\input{titleback} 
 \input{preface}
 \input{extraback}
 \input{sponsors} 
@@ -55,21 +56,25 @@
 
 % sponsors
 
-% ads
+% ads 
 
 % agenda
-
+\strut
+\newpage
+\input{adverts}
 \newpage
 \strut
+\thispagestyle{empty}
+\setcounter{page}{0}
 \tableofcontents
+\clearpage
 
-\input{adverts}
 
+\chapter*{Keynote}
+\newpage
 \renewcommand{\subsectionmark}[1]{\markright{\thesubsection~#1}} 
 \lehead{\mbox{\llap{\small\thepage\kern1em\color{halfgray} \vline}\color{halfgray}\hspace{0.5em}\rightmark\hfil}}
 \pagestyle{scrheadings}
-
-\chapter*{Keynote}
 
 % keynote
 
