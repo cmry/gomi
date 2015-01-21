@@ -317,12 +317,16 @@ def get_agenda(d):
     """
     This will construct a conference programme using a dict with
     submissions id, author and titles according to the specified
-    ordering in agenda.json.
+    ordering in agenda.json. In the newest version, HTML is also
+    incorporated which makes it an ugly-ass function, please make
+    sure to generalize and split into two seperate output functions,
+    using markdown as a base or something.
 
     :param d: dict with int(id): tup(authors, title)
     :return: str agenda in a LaTeX table
     """
-    lin = list()
+    # TODO: try to generalize this stuff to be LaTeX unspecific
+    lin, ltml = list(), list()
     with open('agenda.json', 'r') as f:
         l = loads(f.read())
     for entry in sorted(l["agenda"]):
@@ -330,6 +334,7 @@ def get_agenda(d):
         event = l["agenda"][entry]
         if "what" in event:  # Plenary
             lin.append('\\midrule \n %s & \\multicolumn{5}{l}{\\textbf{%s:} %s %s in %s} \\\\' % (event["time"], event["name"], event["what"], event["by"], event["room"]))
+            ltml.append('<tr><td>%s</td><td colspan="5"><b>%s</b>: %s %s in %s</td></tr> \n' % (event["time"], event["name"], event["what"], event["by"], event["room"]))
         elif "sessions" in event:  # Talks
             namel, rooml, block_m = [], [], []
             for s in event["sessions"]:
@@ -338,13 +343,18 @@ def get_agenda(d):
                 rooml.append(inf["room"])
                 block_m.append(inf["blocks"])
             lin.append('\\midrule \n \\textbf{%s} & %s \\\\ \n %s & \\textbf{%s} \\\\' % (event["name"], ' & '.join(rooml), event["time"], '} & \\textbf{'.join(namel)))
+            ltml.append('<tr><td><b>%s</b></td><td>%s</td></tr>\n<tr><td>%s</td><td><b>%s</b></td></tr> \n' % (event["name"], '</td><td>'.join(rooml), event["time"], '</b></td><td><b>'.join(namel)))
             for i in range(0, len(block_m)-1):
                 lin.append('\\midrule\n')
                 row = [' \\newline '.join(d[block_m[j][i]]) for j in range(0, len(block_m))]
+                rtml = [' <br/> '.join(d[block_m[j][i]]) for j in range(0, len(block_m))]
+                ctml = [x.replace('\\textbf{', '<a href="abstracts#'+str(block_m[j][i])+'">').replace('}', '</a>') for x in rtml]
                 lin.append(' & %s \\\\' % ' & '.join(row))
+                ltml.append('<tr><td></td><td>%s</td></tr> \n' % '</td><td>'.join(ctml))
         else:  # Break etc.
             lin.append('\\midrule \n %s & \\textbf{%s} \\\\' % (event["time"], event["name"]))
-
+            ltml.append('<tr><td>%s</td><td><b>%s</b></td></tr> \n' % (event["time"], event["name"]))
+    agd_to_html(['<table>\n']+ltml+['</table>'])
     return agt('lp{3.5cm}p{3.5cm}p{3.5cm}p{3.5cm}p{3.5cm}', '\n'.join(lin))
 
 
@@ -366,17 +376,15 @@ def get_refs():
 
 
 # TODO: check if this namel tuple makes any sense (used more as string than tuple?)
-def clean_info(title, subm):
+def clean_info(title, namel):
     """
     This will format the title and authors for the conference
     programme in the desired format.
 
     :param title: str abstract title
-    :param subm: list of tup with int(id): tup(first, last)
-    :return: str LaTeX conference programme
+    :param namel: str author names
+    :return: str LaTeX conference programme info
     """
-    # other one don't tuple
-    namel = [(sanitize(entry[0].text) + ' ' + lower_dutch_prep(entry[1].text)) for entry in subm]
     if len(namel) > 5:
         namel = namel[:5]
         namel.append('et. al')
@@ -426,13 +434,34 @@ def divide_abstracts(ad):
     return key, pres, demo, post
 
 
+def agd_to_html(lin):
+    o = open('./abstracts.html', 'ab+')
+    o.write('\n'.join(lin).encode('utf-8'))
+
+def html_abst(aid, title, authors, abstract):
+    return """
+        <a name="%s">
+        <div style="background-color: #411939; color: white; padding-left: 5px;">
+            <h4>%s</h4>
+            %s 
+        </div>
+        %s \n\n""" % (aid, title, authors, abstract)
+
+
+def xml_to_html(d):
+    d = OD(sorted(d.items(), key=lambda (k, v): v[0]))
+    o = open('./abstracts.html', 'ab+')
+    for aid, infl in d.iteritems():
+        o.write(html_abst(str(aid), infl[0], ', '.join(infl[1]), infl[2]).encode("utf-8"))
+
+
 def main():
 
     tree = ET.parse('abstracts.xml')
     submissions = tree.getroot()
-    abstract_dict, agenda_dict = {}, {}
+    abstract_dict, agenda_dict, html_dict = {}, {}, {}
 
-    for submission in submissions:
+    for submission in submissions: 
         if not 'REJECT' in submission[3].text and int(submission.attrib['id']) not in retr:
 
             submission_id = int(submission.attrib['id'])
@@ -440,6 +469,7 @@ def main():
             decision = submission[3].text
             title = format_title(submission[0].text)
             names = [(sanitize(entry[0].text), lower_dutch_prep(entry[1].text)) for entry in submission[4]]
+            namel = [(sanitize(entry[0].text) + ' ' + lower_dutch_prep(entry[1].text)) for entry in submission[4]]
             afilliations = [sanitize(entry[3].text) for entry in submission[4]]
             mails = [(sanitize(entry[2].text) if entry[2].text else '') for entry in submission[4]]
 
@@ -447,7 +477,8 @@ def main():
                      format_toc(title, names), format_table(names, afilliations, mails))
 
             abstract_dict[submission[0].text] = (decision, abstract)
-            agenda_dict[submission_id] = (clean_info(title, submission[4]))  # TODO: clean that out earlier
+            agenda_dict[submission_id] = (clean_info(title, namel))  # TODO: clean that out earlier
+            html_dict[submission_id] = [submission[0].text, namel, submission[2].text.replace('\n', '<br/>')]
             for entry in retr:  # TODO: check if this is still needed
                 agenda_dict[entry] = ('', '')
 
@@ -463,6 +494,7 @@ def main():
         i = i.replace('% refl', get_refs().encode("utf-8"))
         o.write(i)
         o.close()
+    xml_to_html(html_dict)
 
 if __name__ == '__main__':
     main()
