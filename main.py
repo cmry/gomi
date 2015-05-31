@@ -475,7 +475,7 @@ def main():
     with open('./tex/bos_i.tex', 'r') as i:
         o = open('./tex/bos_o.tex', 'w')
         i = i.read()
-        i = i.replace('% agenda', get_agenda(agenda_dict).encode("utf-8"))
+        # i = i.replace('% agenda', get_agenda(agenda_dict).encode("utf-8"))
         i = i.replace('% keynote', '\n'.join(key).encode("utf-8"))
         i = i.replace('% presentations', '\n'.join(pres).encode("utf-8"))
         i = i.replace('% demos', '\n'.join(demo).encode("utf-8"))

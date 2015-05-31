@@ -1,4 +1,4 @@
-\documentclass[10pt, a4paper, twopage, headinclude, footinclude, BCOR5mm]{book}
+\documentclass[10pt, a4paper, twopage, headinclude, footinclude]{book}
 
 \usepackage[hyphens]{url}
 
@@ -6,7 +6,7 @@
 
 \DeclareUnicodeCharacter{00A0}{ }
 
-\usepackage[left=108pt,right=106pt]{geometry}
+\usepackage[left=108pt,right=92pt]{geometry}
 \usepackage{makeidx}
 \usepackage{float}
 \usepackage{scrextend}
@@ -14,9 +14,14 @@
 \usepackage{etoolbox}
 \usepackage{epstopdf}
 \usepackage{multirow}
+\usepackage{nth}
+\usepackage{array}
 \usepackage{rotating}
 \usepackage{lscape}
 \usepackage{longtable}
+\usepackage[dutch,english]{babel}
+
+\geometry{bindingoffset=5mm}
 
 \makeatletter
 \let\zzLT@output\LT@output
@@ -28,10 +33,59 @@
 \setlength{\cftsecnumwidth}{0pt}
 \renewcommand{\cftsecaftersnumb}{\hspace{1.5em}}
 
+% ------------------- headers -----------------------
+
+\renewcommand{\sectionmark}[1]{
+\markright{\textsc%
+{\MakeTextLowercase{}} \spacedlowsmallcaps{#1}}}
+
+\lehead{\mbox{\llap{\small\thepage\kern1em\color{halfgray}%
+\vline}%
+\color{halfgray}\hspace{0.5em}\headmark\hfil}} 
+
+\rohead{\mbox{\hfil{\color{halfgray}%
+\headmark\hspace{0.5em}}%
+\rlap{\small{\color{halfgray}\vline}\kern1em\thepage}}}
+
+\renewcommand{\headfont}{\normalfont\sffamily}
+\renewcommand{\pnumfont}{\small\sffamily}
+
+% ---------------------------------------------------
+
 
 \hyphenation{Fortran hy-phen-ation}
 
 \begin{document}
+
+\newcommand\invisiblesection[1]{%
+	\refstepcounter{section}%
+	\sectionmark{#1}
+}
+
+\newcommand\chappage[1]{
+    \cleardoublepage
+    \begin{figure}[t!]
+    \centering
+	\normalfont\Huge\sffamily{\textsc{\MakeTextLowercase{#1}}}
+    \vspace{8cm}
+    \end{figure}
+    \addcontentsline{toc}{chapter}{#1} 
+	\thispagestyle{empty}
+	\cleardoublepage
+	\invisiblesection{#1}
+}
+
+\newcommand\uchap[1]{
+    \cleardoublepage
+    \begin{figure}[t!]
+    \centering
+	\normalfont\Huge\sffamily{\textsc{\MakeTextLowercase{#1}}}
+    \vspace{8cm}
+    \end{figure}
+	\thispagestyle{empty}
+	\cleardoublepage
+	\invisiblesection{#1}
+}
 
 \newcommand{\confAuth}{John Doe}
 \newcommand{\confCover}{Will Doe}
@@ -41,6 +95,9 @@
 \newcommand{\confOrg}{Some Group}
 \newcommand{\confDate}{DD \& DD Month, YYYY}
 \newcommand{\confBind}{Some copyshop}
+
+\addtocontents{toc}{\protect\thispagestyle{empty}}
+\renewcommand*\contentsname{Abstracts}
 
 \input{title}
 \input{titleback} 
@@ -58,43 +115,44 @@
 
 % ads 
 
+\clearpage
+\uchap{Programme Thursday}
+\input{1stday}
+
+\clearpage
+\uchap{Programme Friday}
 % agenda
-\strut
-\newpage
 \input{adverts}
-\newpage
-\strut
-\thispagestyle{empty}
-\setcounter{page}{0}
 \tableofcontents
 \clearpage
 
-
-\chapter*{Keynote}
-\newpage
-\renewcommand{\subsectionmark}[1]{\markright{\thesubsection~#1}} 
-\lehead{\mbox{\llap{\small\thepage\kern1em\color{halfgray} \vline}\color{halfgray}\hspace{0.5em}\rightmark\hfil}}
+\chappage{Keynote}
+% \renewcommand{\subsectionmark}[1]{\markright{\thesubsection~#1}} 
+\lehead{\mbox{\llap{\small\thepage\kern1em\color{halfgray} \vline}\color{halfgray}\hspace{0.5em}\textsc{clin25 -- antwerpen}\hfil}}
 \pagestyle{scrheadings}
-
+\setcounter{page}{1}
 % keynote
 
 \strut
 \newpage
+\thispagestyle{empty}
 \strut
-\chapter*{Oral Presentations}
+\chappage{Oral Presentations}
 
 % presentations
 
-\chapter*{Demos}
+\chappage{Demos}
 
 % demos
 
-\chapter*{Posters}
+\chappage{Posters}
 
 % posters
 
 \Urlmuskip=0mu plus 1mu\relax
-
+\newpage
+\pagestyle{empty}	
+\pagenumbering{gobble}
 % refl
 
 \newpage
