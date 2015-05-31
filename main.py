@@ -1,17 +1,16 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
-__author__ = 'chris'
-__version__ = '01.15'
-
 import xml.etree.ElementTree as ET
 from collections import OrderedDict as OD
 from copy import deepcopy
 from re import findall
 from json import loads
 
+__author__ = 'chris'
+__version__ = '05.15'
+
 bib = {}
-retr = [28, 8, 18, 20, 43, 97]
+retr = []  # add id numbers which have retracted
 
 
 def sanitize(texs, istex=None):
@@ -22,16 +21,7 @@ def sanitize(texs, istex=None):
     :param texs: str abstract (or any) text in unicode
     :return: str sanitized text ready for LaTeX compiling
     """
-            # names
-    cust = {'Veronique':                                    u'V\u00E9ronique',
-            'Ngoc Thi Do':                                  u'Do',
-            'Antal van den Bosch':                          u'Antal van Den Bosch',
-            # afils
-            'Language and Translation Technology Team, ':   u'',
-            # user errors
-            'CLARIN for Linguists LOT ':                    u'CLARIN%20for%20Linguists%20LOT%20',
-            '2014 Summerschool Illustration ':              u'2014%20Summerschool%20Illustration%20',
-            '1 2014-06-22':                                 u'1%202014-06-22',
+    cust = {  # custom replacements go here
             'htttp':                                        u'http',
             # LaTeX collides
             '{':                                            u'\{',
@@ -50,12 +40,11 @@ def sanitize(texs, istex=None):
             "&amp;":                                        u"&",
             "amp;":                                         u''
             }
-    
+
     for orig, repl in cust.iteritems():
         texs = texs.replace(orig, repl)
     if not istex:  # text only
         texs = texs.replace('\n', ' ')
-        texs = texs.replace(u"""(1)		riet‘reet’		dimensie‘dimension’	 	phonemes	[r	i	t]		d	i=	[m	E	n]=	s	i	[…]	 main stress 	graphemes	r	ie	t		d	i=	m	e	n=	s	ie	dv	default value 	relation	dv	dv	dv		dv	3.3	dv	dv	dv	3.13	4.4	=	syll.boundary""", '\\input{custfig}')
         texs = token_url(texs, True)
     return texs
 
@@ -100,8 +89,6 @@ def format_ref(refs, label):
     """
     global bib
     refs = refs.split('\n')
-    # TODO: find a way to handle the custom line better
-    refs = list(' '.join(refs)) if 'Ramage' in ' '.join(refs) else refs  # custom!
     for n in refs:
         if len(n) > 10:
             n = n[1:] if n.startswith(' ') else n
@@ -343,7 +330,8 @@ def get_agenda(d):
                 rooml.append(inf["room"])
                 block_m.append(inf["blocks"])
             lin.append('\\midrule \n \\textbf{%s} & %s \\\\ \n %s & \\textbf{%s} \\\\' % (event["name"], ' & '.join(rooml), event["time"], '} & \\textbf{'.join(namel)))
-            ltml.append('<tr><td><b>%s</b></td><td>%s</td></tr>\n<tr><td>%s</td><td><b>%s</b></td></tr> \n' % (event["name"], '</td><td>'.join(rooml), event["time"], '</b></td><td><b>'.join(namel)))
+            ltml.append('<tr><td><b>%s</b></td><td>%s</td></tr>\n<tr><td>%s</td><td><b>%s</b></td></tr> \n' %
+                        (event["name"], '</td><td>'.join(rooml), event["time"], '</b></td><td><b>'.join(namel)))
             for i in range(0, len(block_m)-1):
                 lin.append('\\midrule\n')
                 row = [' \\newline '.join(d[block_m[j][i]]) for j in range(0, len(block_m))]
@@ -438,12 +426,13 @@ def agd_to_html(lin):
     o = open('./abstracts.html', 'ab+')
     o.write('\n'.join(lin).encode('utf-8'))
 
+
 def html_abst(aid, title, authors, abstract):
     return """
         <a name="%s">
         <div style="background-color: #411939; color: white; padding-left: 5px;">
             <h4>%s</h4>
-            %s 
+            %s
         </div>
         %s \n\n""" % (aid, title, authors, abstract)
 
@@ -461,8 +450,8 @@ def main():
     submissions = tree.getroot()
     abstract_dict, agenda_dict, html_dict = {}, {}, {}
 
-    for submission in submissions: 
-        if not 'REJECT' in submission[3].text and int(submission.attrib['id']) not in retr:
+    for submission in submissions:
+        if 'REJECT' not in submission[3].text and int(submission.attrib['id']) not in retr:
 
             submission_id = int(submission.attrib['id'])
             # keywords = [k.text for k in submission[1]]
@@ -474,7 +463,7 @@ def main():
             mails = [(sanitize(entry[2].text) if entry[2].text else '') for entry in submission[4]]
 
             abstract = tex(title, format_text(submission[2].text, title),
-                     format_toc(title, names), format_table(names, afilliations, mails))
+                           format_toc(title, names), format_table(names, afilliations, mails))
 
             abstract_dict[submission[0].text] = (decision, abstract)
             agenda_dict[submission_id] = (clean_info(title, namel))  # TODO: clean that out earlier
@@ -486,7 +475,7 @@ def main():
     with open('./tex/bos_i.tex', 'r') as i:
         o = open('./tex/bos_o.tex', 'w')
         i = i.read()
-        i = i.replace('% agenda', get_agenda(agenda_dict).encode("utf-8"))      
+        i = i.replace('% agenda', get_agenda(agenda_dict).encode("utf-8"))
         i = i.replace('% keynote', '\n'.join(key).encode("utf-8"))
         i = i.replace('% presentations', '\n'.join(pres).encode("utf-8"))
         i = i.replace('% demos', '\n'.join(demo).encode("utf-8"))
