@@ -29,11 +29,11 @@ of manual labour is still needed. The important part of the file tree looks like
     └── title.tex
 ```
 
-### abstracts.xml
+#### abstracts.xml
 
 This file gives one example of a submission and how it should look in XML.
 
-### agenda.json
+#### agenda.json
 
 This gives an example of the agenda structure that can be used to generate
 a programme in the LaTeX file. Please note that currently they need to be
@@ -41,53 +41,53 @@ set by hand: you can add, remove or change the names, times and sessions
 and provide a list of id's from `abstracts.xml` for each block where they 
 should be in.
 
-### main.py
+#### main.py
 
 This is the master python file; this needs to be pretty much left alone but
 one can add for example some custom string replacements in the `sanitize.cust`
 dictionary.
 
-### tex - adverts.tex
+#### tex - adverts.tex
 
 These are adverts of gold and silver sponsors, they can be tweaked to fit
 the page formats and some text can be manually provided. Comment out 
 `\input{sponsors}` in `bos_o.tex` if you do no want this.
 
-### tex - bos_i.tex
+#### tex - bos_i.tex
 
 This is the master .tex file; please make changes to the `custom vars` section
 before running `main.py`: the script will fill out specific comment blocks with 
 tex code.
 
-### tex - extraback.tex
+#### tex - extraback.tex
 
 Lists people who have worked on the conference and the previous versions of it.
 Currently these need to be manually added. Comment out `\input{extraback}` in 
 `bos_o.tex` if you do no want this.
 
-### tex - preface.tex
+#### tex - preface.tex
 
 Replace the written text with your own to form a preface. Comment out `\input{preface}` 
 in `bos_o.tex` if you do no want this.
 
-### sponsors
+#### sponsors
 
 Can be used to dump images for the sponsor pages; currently the github svg is in
 there as placeholder material.
 
-### tex - sponsors.tex
+#### tex - sponsors.tex
 
 This lists all the sponsors for the conference, some examples are given on how
 to resize images and such. Need to be manually changed. Comment out `\input{sponsors}` 
 in `bos_o.tex` if you do no want this.
 
-### tex - titleback.tex
+#### tex - titleback.tex
 
 Accredits people who have worked on the conference (and this package by default).
 Currently some names need to be set by hand. Comment out `\input{titleback}` in `bos_o.tex` 
 if you do no want this; referring to this package would be great though :)
 
-### tex - title.tex
+#### tex - title.tex
 
 Title page. comment out `\input{title}` in `bos_o.tex` to not even have a title.
 
@@ -124,7 +124,7 @@ list with IDs from the `abstracts.xml` in accordance to which session
 they belong. If there are any indexing errors with less entries, please
 file an issue on github.
 
-```
+``` json
 { 
 	"agenda": {
 		"01": {
