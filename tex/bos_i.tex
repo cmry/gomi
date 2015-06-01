@@ -87,14 +87,20 @@
 	\invisiblesection{#1}
 }
 
+% ----------------- custom vars ---------------------
+
 \newcommand{\confAuth}{John Doe}
 \newcommand{\confCover}{Will Doe}
 \newcommand{\confName}{Our Great Conference 1999}
 \newcommand{\confAbr}{OGC 99}
+\newcommand{\confAbrl}{ogc99}
 \newcommand{\confLoc}{Some City}
+\newcommand{\confLocl}{some city}
 \newcommand{\confOrg}{Some Group}
 \newcommand{\confDate}{DD \& DD Month, YYYY}
 \newcommand{\confBind}{Some copyshop}
+
+% ---------------------------------------------------
 
 \addtocontents{toc}{\protect\thispagestyle{empty}}
 \renewcommand*\contentsname{Abstracts}
@@ -116,11 +122,7 @@
 % ads 
 
 \clearpage
-\uchap{Programme Thursday}
-\input{1stday}
-
-\clearpage
-\uchap{Programme Friday}
+\uchap{Programme}
 % agenda
 \input{adverts}
 \tableofcontents
@@ -128,7 +130,7 @@
 
 \chappage{Keynote}
 % \renewcommand{\subsectionmark}[1]{\markright{\thesubsection~#1}} 
-\lehead{\mbox{\llap{\small\thepage\kern1em\color{halfgray} \vline}\color{halfgray}\hspace{0.5em}\textsc{clin25 -- antwerpen}\hfil}}
+\lehead{\mbox{\llap{\small\thepage\kern1em\color{halfgray} \vline}\color{halfgray}\hspace{0.5em}\textsc{ \confAbrl -- \conflocl }\hfil}}
 \pagestyle{scrheadings}
 \setcounter{page}{1}
 % keynote
