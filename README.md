@@ -115,10 +115,10 @@ is what it could look like.
 
 Editing `agenda.json` should be straightforward. `"agenda"`, as well
 as the ID numbers for each block (`01` and `02` here) remain unchanged.
-Blocks are applied horizontally, and make one column in your programme
+Blocks are applied horizontally, and make one row in your programme
 table. They are given a name and a time. If you provide `"sessions"`,
 these need to be ID'ed as well (`"s01"` - `"s05"` here). These will be
-applied vertically and will make up the rows in your programme. Give
+applied vertically and will make up the columns in your programme. Give
 them a name and a location, and then manually fill out the `"blocks"`
 list with IDs from the `abstracts.xml` in accordance to which session
 they belong. If there are any indexing errors with less entries, please
