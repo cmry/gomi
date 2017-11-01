@@ -1,0 +1,21 @@
+<submissions>
+  <submission id="1">
+    <title>This is an example title</title>
+    <keywords>
+      <keyword>This is a keyword</keyword>
+      <keyword>This is another keyword</keyword>
+      <keyword>More keywords</keyword>
+    </keywords>
+    <abstract>Bacon ipsum dolor amet frankfurter leberkas exercitation, filet mignon shankle kielbasa sirloin. Corned beef in sint beef ham hock aliquip irure cillum turducken tri-tip velit labore est brisket strip steak. Proident eiusmod in ut, sunt pork chop leberkas ground round kevin occaecat capicola aliquip meatball dolor. Bresaola sunt short ribs dolore kevin eu laborum ham ribeye nisi andouille shoulder. Corned beef beef ribs jowl in, incididunt strip steak excepteur bacon sunt ball tip ham hock magna sed shank biltong.</abstract>
+    <decision>poster</decision>
+    <authors>
+      <author>
+        <first_name>John</first_name>
+        <last_name>Doe</last_name>
+        <e-mail>some@email.com</e-mail>
+        <affiliation>University of Something</affiliation>
+        <country>Some Country</country>
+      </author>
+    </authors>
+  </submission>
+</submissions>
