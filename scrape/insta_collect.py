@@ -35,7 +35,7 @@ def get_insta_soup(url):
     """Fetch page and ignore not available ones."""
     page = requests.get(url)
     if page.status_code != '404':
-        soup = BeautifulSoup(page.content, "lxml")
+        soup = BeautifulSoup(page.content, "html5lib")
         error = soup.find('h2')
         if not error:
             return soup
