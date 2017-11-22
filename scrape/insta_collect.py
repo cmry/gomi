@@ -14,7 +14,7 @@ from bs4 import BeautifulSoup
 
 def batch_files():
     """List jobs (.csvs without _fixed version) in current directory."""
-    files = glob('*.csv')
+    files = glob('./**/*.csv')
 
     done = {f.replace('_fixed.csv', '') for f in files if 'fixed' in f}
     csvs = {c.replace('.csv', '') for c in files if 'fixed' not in c}
@@ -24,7 +24,8 @@ def batch_files():
 
 def parse_json_header(soup):
     """Fetch Instagram JSON object from HTML header."""
-    raw_js = soup.find_all('script')[1].text
+    raw_js = [x.text for x in soup.find_all('script')
+              if 'window._sharedData' in x.text][0]
     clean_js = raw_js.replace('window._sharedData = ', '').replace(';', '')
     jsf = json.loads(clean_js)
     return jsf
@@ -111,8 +112,8 @@ def main():
                                 sorted(user_info.items(), key=lambda x: x[0])]
                         usrf.write("\n".join(usrc))
 
-            except Exception as e:  # captures SSL flood and other quirks
-                print("Error:", str(e))
+            except Exception as errm:  # captures SSL flood and other quirks
+                print("Error:", str(errm))
                 continue
 
             # write image to file
