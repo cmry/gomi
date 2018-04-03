@@ -60,11 +60,11 @@ def get_img_info(img_jsf):
 
 def get_usr_info(user_jsf):
     """Get graph info for post owner."""
-    jsfs = user_jsf['entry_data']['ProfilePage'][0]['user']
+    jsfs = user_jsf['entry_data']['ProfilePage'][0]['graphql']['user']
 
-    user_activity = jsfs['media']['count']
-    user_followers = jsfs['followed_by']['count']
-    user_follows = jsfs['follows']['count']
+    user_activity = jsfs['edge_owner_to_timeline_media']['count']
+    user_followers = jsfs['edge_followed_by']['count']
+    user_follows = jsfs['edge_follow']['count']
 
     return dict(activity=user_activity, followers=user_followers,
                 follows=user_follows)
